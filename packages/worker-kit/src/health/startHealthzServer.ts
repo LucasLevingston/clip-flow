@@ -1,4 +1,4 @@
-import { createServer, type Server } from "node:http";
+import { createServer, type Server } from "node:http"
 
 /**
  * Minimal liveness endpoint every worker exposes (workers/health-worker.md
@@ -8,14 +8,14 @@ import { createServer, type Server } from "node:http";
 export function startHealthzServer(port: number): Server {
   const server = createServer((req, res) => {
     if (req.url === "/healthz") {
-      res.writeHead(200, { "content-type": "application/json" });
-      res.end(JSON.stringify({ status: "ok" }));
-      return;
+      res.writeHead(200, { "content-type": "application/json" })
+      res.end(JSON.stringify({ status: "ok" }))
+      return
     }
-    res.writeHead(404);
-    res.end();
-  });
+    res.writeHead(404)
+    res.end()
+  })
 
-  server.listen(port);
-  return server;
+  server.listen(port)
+  return server
 }

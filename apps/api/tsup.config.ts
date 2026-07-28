@@ -1,4 +1,4 @@
-import { defineConfig } from "tsup";
+import { defineConfig } from "tsup"
 
 export default defineConfig({
   entry: ["src/main.ts"],
@@ -8,4 +8,4 @@ export default defineConfig({
   // Bundle everything so the Docker runner stage only needs this app's own
   // dist/ — no pnpm-specific per-package node_modules to reconstruct.
   noExternal: [/.*/],
-});
+})

@@ -1,11 +1,11 @@
-import "dotenv/config";
-import { prisma } from "../src/prismaClient";
+import "dotenv/config"
+import { prisma } from "../src/prismaClient"
 
 // Development/staging seed only — production never runs this (see
 // docs/database/migrations.md).
 async function main(): Promise<void> {
   if (process.env.NODE_ENV === "production") {
-    throw new Error("Seed must never run against production");
+    throw new Error("Seed must never run against production")
   }
 
   const plans = [
@@ -33,27 +33,27 @@ async function main(): Promise<void> {
       maxVideosPerDayPerChannel: 10,
       priceCents: 49900,
     },
-  ];
+  ]
   for (const plan of plans) {
     await prisma.plan.upsert({
       where: { name: plan.name },
       update: {},
       create: plan,
-    });
+    })
   }
 
   const niches = [
     { name: "Futebol", slug: "futebol", category: "Esportes" },
     { name: "NBA", slug: "nba", category: "Esportes" },
     { name: "Valorant", slug: "valorant", category: "Games" },
-  ];
+  ]
 
   for (const niche of niches) {
     const created = await prisma.niche.upsert({
       where: { slug: niche.slug },
       update: {},
       create: { name: niche.name, slug: niche.slug, status: "ACTIVE" },
-    });
+    })
 
     for (let i = 1; i <= 2; i += 1) {
       await prisma.sourceVideo.create({
@@ -65,7 +65,7 @@ async function main(): Promise<void> {
           status: "APPROVED",
           storageUrl: `https://example-storage.local/seed/${niche.slug}-${i}.mp4`,
         },
-      });
+      })
     }
   }
 }
@@ -73,7 +73,7 @@ async function main(): Promise<void> {
 main()
   .then(() => prisma.$disconnect())
   .catch(async (error: unknown) => {
-    console.error(error);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+    console.error(error)
+    await prisma.$disconnect()
+    process.exit(1)
+  })

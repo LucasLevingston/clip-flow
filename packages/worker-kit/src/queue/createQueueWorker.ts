@@ -1,5 +1,5 @@
-import { Worker, type Processor, type WorkerOptions } from "bullmq";
-import IORedis from "ioredis";
+import { Worker, type Processor, type WorkerOptions } from "bullmq"
+import IORedis from "ioredis"
 
 /**
  * Every Clip Flow worker consumes exactly one named queue (see
@@ -12,12 +12,9 @@ export function createQueueWorker(
   processor: Processor,
   options?: Partial<WorkerOptions>,
 ): Worker {
-  const connection = new IORedis(
-    process.env.REDIS_URL ?? "redis://localhost:6379",
-    {
-      maxRetriesPerRequest: null,
-    },
-  );
+  const connection = new IORedis(process.env.REDIS_URL ?? "redis://localhost:6379", {
+    maxRetriesPerRequest: null,
+  })
 
-  return new Worker(queueName, processor, { ...options, connection });
+  return new Worker(queueName, processor, { ...options, connection })
 }

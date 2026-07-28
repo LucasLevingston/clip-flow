@@ -1,22 +1,17 @@
-import { createQueueWorker } from "@clip-flow/worker-kit";
-import { startVideoQueueConsumer } from "./queueConsumer";
+import { createQueueWorker } from "@clip-flow/worker-kit"
+import { startVideoQueueConsumer } from "./queueConsumer"
 
-jest.mock("@clip-flow/worker-kit");
+jest.mock("@clip-flow/worker-kit")
 
 describe("startVideoQueueConsumer", () => {
   it("should create a queue worker bound to the video queue and process a job", async () => {
-    startVideoQueueConsumer();
+    startVideoQueueConsumer()
 
-    expect(createQueueWorker).toHaveBeenCalledWith(
-      "video",
-      expect.any(Function),
-    );
+    expect(createQueueWorker).toHaveBeenCalledWith("video", expect.any(Function))
 
-    const mockCreate = createQueueWorker as jest.Mock;
-    const processor = mockCreate.mock.calls[0][1] as (job: {
-      id: string;
-    }) => Promise<void>;
+    const mockCreate = createQueueWorker as jest.Mock
+    const processor = mockCreate.mock.calls[0][1] as (job: { id: string }) => Promise<void>
 
-    await expect(processor({ id: "job-1" })).resolves.toBeUndefined();
-  });
-});
+    await expect(processor({ id: "job-1" })).resolves.toBeUndefined()
+  })
+})

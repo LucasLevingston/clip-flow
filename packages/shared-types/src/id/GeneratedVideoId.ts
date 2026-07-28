@@ -1,3 +1,3 @@
-import { createIdType } from "./createIdType";
+import { createIdType } from "./createIdType"
 
-export const GeneratedVideoId = createIdType("GeneratedVideoId");
+export const GeneratedVideoId = createIdType("GeneratedVideoId")

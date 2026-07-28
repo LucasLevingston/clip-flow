@@ -1,5 +1,5 @@
-import { createQueueWorker } from "@clip-flow/worker-kit";
-import type { Job, Worker } from "bullmq";
+import { createQueueWorker } from "@clip-flow/worker-kit"
+import type { Job, Worker } from "bullmq"
 
 /**
  * Consumes the `ai` queue. Real transcription/highlight-selection/copy
@@ -8,7 +8,7 @@ import type { Job, Worker } from "bullmq";
  */
 export function startAiQueueConsumer(): Worker {
   return createQueueWorker("ai", (job: Job) => {
-    console.log(`[ai] received job ${job.id}`);
-    return Promise.resolve();
-  });
+    console.log(`[ai] received job ${job.id}`)
+    return Promise.resolve()
+  })
 }

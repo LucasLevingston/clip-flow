@@ -1,5 +1,5 @@
-import "dotenv/config";
-import { defineConfig } from "prisma/config";
+import "dotenv/config"
+import { defineConfig } from "prisma/config"
 
 // Prisma 7 config — connection URL lives here (used by the CLI for
 // migrate/studio), not in schema.prisma. The runtime PrismaClient gets its
@@ -12,4 +12,4 @@ export default defineConfig({
   datasource: {
     url: process.env.DATABASE_URL,
   },
-});
+})

@@ -1,4 +1,4 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance } from "fastify"
 
 /**
  * Liveness endpoint for the API process (see docs/observability/observability.md
@@ -6,5 +6,5 @@ import type { FastifyInstance } from "fastify";
  * monitoring).
  */
 export function healthRoute(app: FastifyInstance): void {
-  app.get("/healthz", () => ({ status: "ok" }));
+  app.get("/healthz", () => ({ status: "ok" }))
 }

@@ -1,5 +1,5 @@
-import { createQueueWorker } from "@clip-flow/worker-kit";
-import type { Job, Worker } from "bullmq";
+import { createQueueWorker } from "@clip-flow/worker-kit"
+import type { Job, Worker } from "bullmq"
 
 /**
  * Consumes the `health` queue (control/trigger jobs only — the actual
@@ -9,7 +9,7 @@ import type { Job, Worker } from "bullmq";
  */
 export function startHealthQueueConsumer(): Worker {
   return createQueueWorker("health", (job: Job) => {
-    console.log(`[health] received job ${job.id}`);
-    return Promise.resolve();
-  });
+    console.log(`[health] received job ${job.id}`)
+    return Promise.resolve()
+  })
 }

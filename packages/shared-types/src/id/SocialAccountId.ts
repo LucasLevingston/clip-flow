@@ -1,3 +1,3 @@
-import { createIdType } from "./createIdType";
+import { createIdType } from "./createIdType"
 
-export const SocialAccountId = createIdType("SocialAccountId");
+export const SocialAccountId = createIdType("SocialAccountId")

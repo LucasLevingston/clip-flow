@@ -1,3 +1,3 @@
-import { createIdType } from "./createIdType";
+import { createIdType } from "./createIdType"
 
-export const ChannelId = createIdType("ChannelId");
+export const ChannelId = createIdType("ChannelId")

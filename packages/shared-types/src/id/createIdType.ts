@@ -1,17 +1,16 @@
-import { randomUUID } from "node:crypto";
+import { randomUUID } from "node:crypto"
 
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 
 export interface Id<Brand extends string> {
-  readonly value: string;
-  readonly brand: Brand;
+  readonly value: string
+  readonly brand: Brand
 }
 
 export interface IdType<Brand extends string> {
-  create(value: string): Id<Brand>;
-  generate(): Id<Brand>;
-  equals(a: Id<Brand>, b: Id<Brand>): boolean;
+  create(value: string): Id<Brand>
+  generate(): Id<Brand>
+  equals(a: Id<Brand>, b: Id<Brand>): boolean
 }
 
 /**
@@ -19,21 +18,19 @@ export interface IdType<Brand extends string> {
  * Guards against passing one entity's id where another's is expected, even
  * though both are plain UUID strings underneath.
  */
-export function createIdType<Brand extends string>(
-  brand: Brand,
-): IdType<Brand> {
+export function createIdType<Brand extends string>(brand: Brand): IdType<Brand> {
   return {
     create(value: string): Id<Brand> {
       if (!UUID_PATTERN.test(value)) {
-        throw new Error(`Invalid ${brand}: "${value}" is not a UUID`);
+        throw new Error(`Invalid ${brand}: "${value}" is not a UUID`)
       }
-      return { value, brand };
+      return { value, brand }
     },
     generate(): Id<Brand> {
-      return { value: randomUUID(), brand };
+      return { value: randomUUID(), brand }
     },
     equals(a: Id<Brand>, b: Id<Brand>): boolean {
-      return a.value === b.value;
+      return a.value === b.value
     },
-  };
+  }
 }

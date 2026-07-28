@@ -1,7 +1,7 @@
-const tseslint = require("typescript-eslint");
-const boundaries = require("eslint-plugin-boundaries");
-const prettier = require("eslint-config-prettier");
-const globals = require("globals");
+const tseslint = require("typescript-eslint")
+const boundaries = require("eslint-plugin-boundaries")
+const prettier = require("eslint-config-prettier")
+const globals = require("globals")
 
 /**
  * Shared ESLint flat config for Clip Flow.
@@ -48,10 +48,7 @@ function createConfig({ tsconfigRootDir }) {
         ],
       },
       rules: {
-        "max-lines": [
-          "error",
-          { max: 100, skipBlankLines: true, skipComments: true },
-        ],
+        "max-lines": ["error", { max: 100, skipBlankLines: true, skipComments: true }],
         complexity: ["error", 10],
         "max-params": ["error", 4],
         "max-depth": ["error", 3],
@@ -59,10 +56,7 @@ function createConfig({ tsconfigRootDir }) {
         "no-param-reassign": "error",
         "@typescript-eslint/no-explicit-any": "error",
         "@typescript-eslint/no-floating-promises": "error",
-        "@typescript-eslint/no-unused-vars": [
-          "error",
-          { argsIgnorePattern: "^_" },
-        ],
+        "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
         "boundaries/dependencies": [
           "error",
           {
@@ -119,15 +113,12 @@ function createConfig({ tsconfigRootDir }) {
         "@typescript-eslint/no-unsafe-member-access": "off",
         "@typescript-eslint/no-unsafe-argument": "off",
         "@typescript-eslint/no-unsafe-return": "off",
-        "max-lines": [
-          "error",
-          { max: 200, skipBlankLines: true, skipComments: true },
-        ],
+        "max-lines": ["error", { max: 200, skipBlankLines: true, skipComments: true }],
         "max-classes-per-file": "off",
       },
     },
     prettier,
-  );
+  )
 }
 
-module.exports = { createConfig };
+module.exports = { createConfig }

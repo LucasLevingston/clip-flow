@@ -1,5 +1,5 @@
-import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "./generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg"
+import { PrismaClient } from "./generated/prisma/client"
 
 /**
  * Singleton PrismaClient, wired to the Postgres driver adapter Prisma 7
@@ -9,4 +9,4 @@ import { PrismaClient } from "./generated/prisma/client";
  */
 export const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL ?? "" }),
-});
+})

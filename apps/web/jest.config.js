@@ -1,6 +1,6 @@
-const nextJest = require("next/jest");
+const nextJest = require("next/jest")
 
-const createJestConfig = nextJest({ dir: "./" });
+const createJestConfig = nextJest({ dir: "./" })
 
 module.exports = createJestConfig({
   testEnvironment: "jsdom",
@@ -14,4 +14,4 @@ module.exports = createJestConfig({
     },
   },
   coveragePathIgnorePatterns: ["/node_modules/", "/.next/", "layout\\.tsx$"],
-});
+})

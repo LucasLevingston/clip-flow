@@ -7,6 +7,9 @@ settings:
 importers:
   .:
     devDependencies:
+      "@clip-flow/prettier-config":
+        specifier: workspace:^
+        version: link:packages/config/prettier-config
       eslint:
         specifier: ^10.8.0
         version: 10.8.0(jiti@2.7.0)

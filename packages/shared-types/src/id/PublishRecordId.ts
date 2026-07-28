@@ -1,3 +1,3 @@
-import { createIdType } from "./createIdType";
+import { createIdType } from "./createIdType"
 
-export const PublishRecordId = createIdType("PublishRecordId");
+export const PublishRecordId = createIdType("PublishRecordId")
