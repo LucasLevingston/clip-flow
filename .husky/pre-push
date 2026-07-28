@@ -1,0 +1,4 @@
+pnpm check:file-boundaries --all
+pnpm type-check
+pnpm test:coverage
+pnpm build

@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, master, develop]
+  push:
+    branches: [main, master, develop]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: One-export-per-file boundary check
+        run: pnpm check:file-boundaries --all
+
+      - name: Lint (includes max-lines, complexity, DDD boundaries)
+        run: pnpm lint
+
+      - name: Type check
+        run: pnpm type-check
+
+      - name: Test with coverage (90% gate)
+        run: pnpm test:coverage
+
+      - name: Build
+        run: pnpm build

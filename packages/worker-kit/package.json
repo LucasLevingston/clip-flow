@@ -1,0 +1,27 @@
+{
+  "name": "@clip-flow/worker-kit",
+  "version": "0.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "eslint .",
+    "type-check": "tsc -p tsconfig.json --noEmit",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "bullmq": "^5.81.2",
+    "ioredis": "^5.11.1"
+  },
+  "devDependencies": {
+    "@clip-flow/eslint-config": "workspace:^",
+    "@clip-flow/jest-preset": "workspace:^",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.0.0",
+    "jest": "^30.4.2",
+    "ts-jest": "^29.4.12",
+    "typescript": "^5.9.3"
+  }
+}

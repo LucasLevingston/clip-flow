@@ -1,0 +1,385 @@
+// Prisma schema — mirrors docs/database/er-model.md and
+// docs/database/relationships-indexes.md exactly. Kept as a single file
+// (Prisma's own convention); SRP/max-lines rules target application code,
+// not this declarative data model.
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model Tenant {
+  id        String    @id @default(uuid())
+  name      String
+  timezone  String
+  createdAt DateTime  @default(now()) @map("created_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  memberships   Membership[]
+  subscription  Subscription?
+  channels      Channel[]
+  notifications Notification[]
+
+  @@map("tenant")
+}
+
+model User {
+  id              String    @id @default(uuid())
+  email           String    @unique
+  passwordHash    String    @map("password_hash")
+  isPlatformAdmin Boolean   @default(false) @map("is_platform_admin")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  deletedAt       DateTime? @map("deleted_at")
+
+  memberships             Membership[]
+  notifications           Notification[]
+  notificationPreferences NotificationPreference[]
+
+  @@map("user")
+}
+
+model Membership {
+  id        String         @id @default(uuid())
+  tenantId  String         @map("tenant_id")
+  userId    String         @map("user_id")
+  role      MembershipRole
+  createdAt DateTime       @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, userId])
+  @@map("membership")
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+model Plan {
+  id                        String @id @default(uuid())
+  name                      String @unique
+  maxChannels               Int    @map("max_channels")
+  maxVideosPerDayPerChannel Int    @map("max_videos_per_day_per_channel")
+  priceCents                Int    @map("price_cents")
+
+  subscriptions Subscription[]
+
+  @@map("plan")
+}
+
+model Subscription {
+  id               String             @id @default(uuid())
+  tenantId         String             @unique @map("tenant_id")
+  planId           String             @map("plan_id")
+  status           SubscriptionStatus
+  currentPeriodEnd DateTime?          @map("current_period_end")
+  createdAt        DateTime           @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  plan   Plan   @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@map("subscription")
+}
+
+enum NicheStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Niche {
+  id                     String      @id @default(uuid())
+  name                   String
+  slug                   String      @unique
+  status                 NicheStatus @default(INACTIVE)
+  activePromptTemplateId String?     @map("active_prompt_template_id")
+  createdAt              DateTime    @default(now()) @map("created_at")
+
+  sourceVideos    SourceVideo[]
+  promptTemplates PromptTemplate[]
+  channels        Channel[]
+
+  @@map("niche")
+}
+
+enum LicenseType {
+  PUBLIC_DOMAIN
+  CREATIVE_COMMONS
+  PARTNER_AGREEMENT
+}
+
+enum SourceVideoStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  ARCHIVED
+}
+
+model SourceVideo {
+  id               String            @id @default(uuid())
+  nicheId          String            @map("niche_id")
+  durationSeconds  Int               @map("duration_seconds")
+  licenseType      LicenseType       @map("license_type")
+  licenseReference String            @map("license_reference")
+  status           SourceVideoStatus @default(PENDING_REVIEW)
+  storageUrl       String            @map("storage_url")
+  createdAt        DateTime          @default(now()) @map("created_at")
+
+  niche           Niche            @relation(fields: [nicheId], references: [id], onDelete: Restrict)
+  transcript      Transcript?
+  generatedVideos GeneratedVideo[]
+
+  @@index([nicheId, status])
+  @@map("source_video")
+}
+
+enum PromptTemplateType {
+  HIGHLIGHT_SELECTION
+  COPY_GENERATION
+}
+
+model PromptTemplate {
+  id        String             @id @default(uuid())
+  nicheId   String             @map("niche_id")
+  type      PromptTemplateType
+  content   String
+  version   Int
+  createdAt DateTime           @default(now()) @map("created_at")
+
+  niche Niche @relation(fields: [nicheId], references: [id], onDelete: Restrict)
+
+  @@map("prompt_template")
+}
+
+enum ChannelPlatforms {
+  SHORTS_ONLY
+  TIKTOK_ONLY
+  BOTH
+}
+
+enum ChannelStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+}
+
+model Channel {
+  id               String           @id @default(uuid())
+  tenantId         String           @map("tenant_id")
+  nicheId          String           @map("niche_id")
+  name             String
+  language         String
+  promptOverride   String?          @map("prompt_override")
+  videosPerDay     Int              @map("videos_per_day")
+  publishTimes     Json             @map("publish_times")
+  generationTime   String           @map("generation_time")
+  platforms        ChannelPlatforms
+  thumbnailEnabled Boolean          @default(true) @map("thumbnail_enabled")
+  status           ChannelStatus    @default(DRAFT)
+  createdAt        DateTime         @default(now()) @map("created_at")
+
+  tenant          Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  niche           Niche            @relation(fields: [nicheId], references: [id], onDelete: Restrict)
+  socialAccounts  SocialAccount[]
+  insights        ChannelInsights?
+  generatedVideos GeneratedVideo[]
+
+  @@index([tenantId, status])
+  @@index([nicheId, status])
+  @@map("channel")
+}
+
+enum SocialPlatform {
+  YOUTUBE
+  TIKTOK
+}
+
+enum SocialAccountStatus {
+  CONNECTED
+  NEEDS_REAUTH
+  DISCONNECTED
+}
+
+model SocialAccount {
+  id                String              @id @default(uuid())
+  channelId         String              @map("channel_id")
+  platform          SocialPlatform
+  externalAccountId String              @map("external_account_id")
+  status            SocialAccountStatus @default(CONNECTED)
+  encryptedTokens   Bytes               @map("encrypted_tokens")
+  tokenKeyVersion   Int                 @map("token_key_version")
+  refreshExpiresAt  DateTime?           @map("refresh_expires_at")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  deletedAt         DateTime?           @map("deleted_at")
+
+  channel        Channel         @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  publishRecords PublishRecord[]
+
+  @@unique([channelId, platform])
+  @@index([channelId, status])
+  @@map("social_account")
+}
+
+model ChannelInsights {
+  channelId            String   @id @map("channel_id")
+  bestPublishHours     Json     @map("best_publish_hours")
+  topTitlePatterns     Json     @map("top_title_patterns")
+  topHashtags          Json     @map("top_hashtags")
+  avgOptimalDurationMs Int      @map("avg_optimal_duration_ms")
+  computedAt           DateTime @map("computed_at")
+
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@map("channel_insights")
+}
+
+enum GeneratedVideoStatus {
+  SOURCING
+  TRANSCRIBING
+  PENDING_MODERATION
+  CONTENT_READY
+  CUTTING
+  READY_TO_PUBLISH
+  PUBLISHED
+  FAILED
+  REJECTED
+}
+
+model GeneratedVideo {
+  id                 String               @id @default(uuid())
+  tenantId           String               @map("tenant_id")
+  channelId          String               @map("channel_id")
+  sourceVideoId      String               @map("source_video_id")
+  batchRunId         String               @map("batch_run_id")
+  scheduledPublishAt DateTime             @map("scheduled_publish_at")
+  status             GeneratedVideoStatus @default(SOURCING)
+  highlight          Json?
+  copy               Json?
+  thumbnailUrl       String?              @map("thumbnail_url")
+  finalAssetUrl      String?              @map("final_asset_url")
+  failureReason      String?              @map("failure_reason")
+  createdAt          DateTime             @default(now()) @map("created_at")
+  updatedAt          DateTime             @updatedAt @map("updated_at")
+
+  channel        Channel         @relation(fields: [channelId], references: [id], onDelete: Restrict)
+  sourceVideo    SourceVideo     @relation(fields: [sourceVideoId], references: [id], onDelete: Restrict)
+  publishRecords PublishRecord[]
+
+  @@unique([channelId, batchRunId, scheduledPublishAt])
+  @@index([tenantId, createdAt(sort: Desc)])
+  @@index([channelId, createdAt(sort: Desc)])
+  @@index([channelId, sourceVideoId])
+  @@map("generated_video")
+}
+
+model Transcript {
+  id            String   @id @default(uuid())
+  sourceVideoId String   @unique @map("source_video_id")
+  segments      Json
+  language      String
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  sourceVideo SourceVideo @relation(fields: [sourceVideoId], references: [id], onDelete: Restrict)
+
+  @@map("transcript")
+}
+
+enum PublishRecordStatus {
+  PUBLISHED
+  FAILED
+}
+
+model PublishRecord {
+  id               String              @id @default(uuid())
+  generatedVideoId String              @map("generated_video_id")
+  socialAccountId  String              @map("social_account_id")
+  platform         SocialPlatform
+  externalPostId   String?             @map("external_post_id")
+  status           PublishRecordStatus
+  failureReason    String?             @map("failure_reason")
+  publishedAt      DateTime?           @map("published_at")
+
+  generatedVideo     GeneratedVideo      @relation(fields: [generatedVideoId], references: [id], onDelete: Restrict)
+  socialAccount      SocialAccount       @relation(fields: [socialAccountId], references: [id], onDelete: Restrict)
+  analyticsSnapshots AnalyticsSnapshot[]
+
+  @@unique([generatedVideoId, socialAccountId])
+  @@map("publish_record")
+}
+
+model AnalyticsSnapshot {
+  id              String   @id @default(uuid())
+  publishRecordId String   @map("publish_record_id")
+  views           Int
+  likes           Int
+  comments        Int
+  shares          Int
+  retentionRate   Float    @map("retention_rate")
+  ctr             Float
+  collectedAt     DateTime @default(now()) @map("collected_at")
+
+  publishRecord PublishRecord @relation(fields: [publishRecordId], references: [id], onDelete: Cascade)
+
+  @@index([publishRecordId, collectedAt(sort: Desc)])
+  @@map("analytics_snapshot")
+}
+
+model Notification {
+  id        String    @id @default(uuid())
+  tenantId  String    @map("tenant_id")
+  userId    String    @map("user_id")
+  category  String
+  payload   Json
+  readAt    DateTime? @map("read_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, userId, readAt])
+  @@map("notification")
+}
+
+model NotificationPreference {
+  userId       String  @map("user_id")
+  category     String
+  emailEnabled Boolean @default(true) @map("email_enabled")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, category])
+  @@map("notification_preference")
+}
+
+enum AuditActorType {
+  TENANT_USER
+  PLATFORM_ADMIN
+  SYSTEM
+}
+
+model AuditLog {
+  id          String         @id @default(uuid())
+  actorUserId String?        @map("actor_user_id")
+  actorType   AuditActorType @map("actor_type")
+  action      String
+  targetType  String         @map("target_type")
+  targetId    String         @map("target_id")
+  metadata    Json?
+  createdAt   DateTime       @default(now()) @map("created_at")
+
+  @@map("audit_log")
+}
