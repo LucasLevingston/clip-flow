@@ -24,6 +24,18 @@
     "test:coverage": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"]
+    },
+    "db:generate": {
+      "cache": true,
+      "outputs": ["src/generated/**"]
+    },
+    "@clip-flow/database#build": {
+      "dependsOn": ["^build", "db:generate"],
+      "outputs": ["dist/**"]
+    },
+    "@clip-flow/database#type-check": {
+      "dependsOn": ["^build", "db:generate"],
+      "outputs": []
     }
   }
 }

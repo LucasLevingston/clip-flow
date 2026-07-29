@@ -1,8 +1,8 @@
-import { buildServer } from "./buildServer"
+import { buildTestServer } from "../../test-utils/buildTestServer"
 
 describe("buildServer", () => {
   it("should respond 200 with status ok on GET /healthz", async () => {
-    const app = buildServer()
+    const { app } = buildTestServer()
 
     const response = await app.inject({ method: "GET", url: "/healthz" })
 
@@ -13,7 +13,7 @@ describe("buildServer", () => {
   })
 
   it("should respond 404 for an unknown route", async () => {
-    const app = buildServer()
+    const { app } = buildTestServer()
 
     const response = await app.inject({ method: "GET", url: "/unknown" })
 

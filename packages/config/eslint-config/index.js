@@ -115,6 +115,10 @@ function createConfig({ tsconfigRootDir }) {
         "@typescript-eslint/no-unsafe-return": "off",
         "max-lines": ["error", { max: 200, skipBlankLines: true, skipComments: true }],
         "max-classes-per-file": "off",
+        // Test files legitimately import fakes/fixtures from a shared
+        // test-utils tree that sits outside the four architectural layers —
+        // that tree is not part of the layering this rule protects.
+        "boundaries/dependencies": "off",
       },
     },
     prettier,
