@@ -31,6 +31,8 @@ export function createBillingDeps(input: CreateBillingDepsInput) {
   }
 
   return {
+    planRepository,
+    channelUsageProvider: billingDeps.channelUsageProvider,
     subscription: {
       getPlansUseCase: new GetPlansUseCase(billingDeps),
       getSubscriptionUseCase: new GetSubscriptionUseCase(billingDeps),

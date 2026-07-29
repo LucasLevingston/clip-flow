@@ -3,6 +3,8 @@
 > Revisado após [ADR-0011](../adr/0011-channel-as-aggregate.md) — `channel` substitui `niche_subscription` + `publish_schedule`; `social_account` migrou de `tenant_id` para `channel_id`; `generated_video` referencia `channel_id`; nova tabela `channel_insights`.
 >
 > Revisado na Sprint 2 (EPIC-02/EPIC-03) para fechar o contrato já documentado em [api/niches-api.md](../api/niches-api.md) e [api/billing-api.md](../api/billing-api.md): `niche` ganha `description`/`category`/`preview_thumbnail_url` (necessários para navegação do catálogo, RF-03); `plan` ganha `stripe_price_id` e `subscription` ganha `stripe_customer_id`/`stripe_subscription_id` (necessários para checkout e sincronização de webhook, RF-08).
+>
+> Revisado na Sprint 3 (EPIC-02.F2/EPIC-04.F1): `channel` ganha `deleted_at` — `DELETE /v1/channels/:channelId` ([api/channels-api.md](../api/channels-api.md)) precisa remover o canal da visão do tenant mantendo `generated_video` referenciável para auditoria, o que a FK `Restrict` de `generated_video.channel_id` não permitiria com um DELETE físico.
 
 ```mermaid
 erDiagram
@@ -109,6 +111,7 @@ erDiagram
     boolean thumbnail_enabled
     string status
     timestamp created_at
+    timestamp deleted_at "nullable — remoção é soft delete, preserva histórico de GENERATED_VIDEO"
   }
   SOCIAL_ACCOUNT {
     uuid id PK

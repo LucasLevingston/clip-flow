@@ -4,7 +4,12 @@ import { healthRoute } from "./healthRoute"
 import { type AuthRoutesDeps, registerAuthRoutes } from "./routes/authRoutes"
 import { type BillingRoutesDeps, registerBillingRoutes } from "./routes/billingRoutes"
 import { type CatalogRoutesDeps, registerCatalogRoutes } from "./routes/catalogRoutes"
+import { type ChannelRoutesDeps, registerChannelRoutes } from "./routes/channelRoutes"
 import { type MemberRoutesDeps, registerMemberRoutes } from "./routes/memberRoutes"
+import {
+  type SocialAccountRoutesDeps,
+  registerSocialAccountRoutes,
+} from "./routes/socialAccountRoutes"
 import {
   type SubscriptionRoutesDeps,
   registerSubscriptionRoutes,
@@ -17,6 +22,8 @@ export interface ServerDeps {
   catalog: CatalogRoutesDeps
   subscription: SubscriptionRoutesDeps
   billing: BillingRoutesDeps
+  channels: ChannelRoutesDeps
+  socialAccounts: SocialAccountRoutesDeps
 }
 
 /**
@@ -34,6 +41,8 @@ export function buildServer(deps: ServerDeps): FastifyInstance {
   registerCatalogRoutes(app, deps.catalog)
   registerSubscriptionRoutes(app, deps.subscription)
   registerBillingRoutes(app, deps.billing)
+  registerChannelRoutes(app, deps.channels)
+  registerSocialAccountRoutes(app, deps.socialAccounts)
 
   return app
 }

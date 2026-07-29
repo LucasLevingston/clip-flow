@@ -4,3 +4,14 @@ export { inviteMemberSchema, type InviteMemberInput } from "./auth/inviteMemberS
 export { acceptInvitationSchema, type AcceptInvitationInput } from "./auth/acceptInvitationSchema"
 export { listNichesQuerySchema, type ListNichesQuery } from "./catalog/listNichesQuerySchema"
 export { changePlanSchema, type ChangePlanInput } from "./billing/changePlanSchema"
+export { createChannelSchema, type CreateChannelInput } from "./channels/createChannelSchema"
+export { listChannelsQuerySchema, type ListChannelsQuery } from "./channels/listChannelsQuerySchema"
+export {
+  updateChannelConfigSchema,
+  type UpdateChannelConfigInput,
+} from "./channels/updateChannelConfigSchema"
+export {
+  changeChannelStatusSchema,
+  type ChangeChannelStatusInput,
+} from "./channels/changeChannelStatusSchema"
+export { oauthCallbackSchema, type OAuthCallbackInput } from "./social-accounts/oauthCallbackSchema"

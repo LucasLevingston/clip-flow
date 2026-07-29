@@ -15,6 +15,8 @@ import { Sha256RefreshTokenHasher } from "./infrastructure/auth/Sha256RefreshTok
 import { SystemClock } from "./infrastructure/auth/SystemClock"
 import { UuidGenerator } from "./infrastructure/auth/UuidGenerator"
 import { createBillingDeps } from "./infrastructure/billing/createBillingDeps"
+import { createChannelManagementDeps } from "./infrastructure/channel-management/createChannelManagementDeps"
+import { createSocialAccountDeps } from "./infrastructure/channel-management/createSocialAccountDeps"
 import { InvitationPrismaRepository } from "./infrastructure/repositories/InvitationPrismaRepository"
 import { MembershipPrismaRepository } from "./infrastructure/repositories/MembershipPrismaRepository"
 import { NichePrismaRepository } from "./infrastructure/repositories/NichePrismaRepository"
@@ -59,6 +61,14 @@ const catalogDeps = {
 }
 
 const billing = createBillingDeps({ subscriptionRepository, userRepository, jwtService })
+const channels = createChannelManagementDeps({
+  nicheRepository: catalogDeps.nicheRepository,
+  subscriptionRepository,
+  planRepository: billing.planRepository,
+  channelUsageProvider: billing.channelUsageProvider,
+  jwtService,
+})
+const socialAccounts = createSocialAccountDeps({ jwtService })
 
 const app = buildServer({
   auth: {
@@ -81,6 +91,8 @@ const app = buildServer({
   },
   subscription: billing.subscription,
   billing: billing.billing,
+  channels,
+  socialAccounts,
 })
 
 const port = process.env.PORT ? Number(process.env.PORT) : 3000

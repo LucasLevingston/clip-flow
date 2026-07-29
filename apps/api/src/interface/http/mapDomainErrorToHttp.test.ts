@@ -1,5 +1,11 @@
 import { DowngradeBlockedByUsageError } from "../../domain/billing/errors/DowngradeBlockedByUsageError"
+import { PlanLimitExceededError } from "../../domain/billing/errors/PlanLimitExceededError"
 import { StripeCheckoutError } from "../../domain/billing/errors/StripeCheckoutError"
+import { ChannelNotReadyError } from "../../domain/channel-management/errors/ChannelNotReadyError"
+import { InvalidOAuthStateError } from "../../domain/channel-management/errors/InvalidOAuthStateError"
+import { NicheImmutableError } from "../../domain/channel-management/errors/NicheImmutableError"
+import { OAuthExchangeFailedError } from "../../domain/channel-management/errors/OAuthExchangeFailedError"
+import { SocialAccountAlreadyConnectedError } from "../../domain/channel-management/errors/SocialAccountAlreadyConnectedError"
 import { EmailAlreadyExistsError } from "../../domain/identity/errors/EmailAlreadyExistsError"
 import { mapDomainErrorToHttp } from "./mapDomainErrorToHttp"
 
@@ -22,6 +28,48 @@ describe("mapDomainErrorToHttp", () => {
     expect(mapDomainErrorToHttp(new StripeCheckoutError("timeout"))).toEqual({
       statusCode: 502,
       code: "STRIPE_ERROR",
+    })
+  })
+
+  it("should map PlanLimitExceededError to 422", () => {
+    expect(mapDomainErrorToHttp(new PlanLimitExceededError("channels"))).toEqual({
+      statusCode: 422,
+      code: "PLAN_LIMIT_EXCEEDED",
+    })
+  })
+
+  it("should map NicheImmutableError to 422", () => {
+    expect(mapDomainErrorToHttp(new NicheImmutableError())).toEqual({
+      statusCode: 422,
+      code: "NICHE_IMMUTABLE",
+    })
+  })
+
+  it("should map ChannelNotReadyError to 422", () => {
+    expect(mapDomainErrorToHttp(new ChannelNotReadyError())).toEqual({
+      statusCode: 422,
+      code: "CHANNEL_NOT_READY",
+    })
+  })
+
+  it("should map SocialAccountAlreadyConnectedError to 409", () => {
+    expect(mapDomainErrorToHttp(new SocialAccountAlreadyConnectedError("YOUTUBE"))).toEqual({
+      statusCode: 409,
+      code: "SOCIAL_ACCOUNT_ALREADY_CONNECTED",
+    })
+  })
+
+  it("should map InvalidOAuthStateError to 400", () => {
+    expect(mapDomainErrorToHttp(new InvalidOAuthStateError())).toEqual({
+      statusCode: 400,
+      code: "INVALID_OAUTH_STATE",
+    })
+  })
+
+  it("should map OAuthExchangeFailedError to 502", () => {
+    expect(mapDomainErrorToHttp(new OAuthExchangeFailedError("timeout"))).toEqual({
+      statusCode: 502,
+      code: "OAUTH_EXCHANGE_FAILED",
     })
   })
 

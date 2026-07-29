@@ -28,4 +28,8 @@ export class InMemoryNicheRepository implements NicheRepository {
     const niche = this.nichesById.get(id)
     return Promise.resolve(niche && niche.status === "ACTIVE" ? niche : null)
   }
+
+  findById(id: string): Promise<Niche | null> {
+    return Promise.resolve(this.nichesById.get(id) ?? null)
+  }
 }

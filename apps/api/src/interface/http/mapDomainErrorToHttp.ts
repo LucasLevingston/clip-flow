@@ -14,6 +14,15 @@ const MAPPING: Record<string, HttpErrorMapping> = {
   DowngradeBlockedByUsageError: { statusCode: 422, code: "DOWNGRADE_BLOCKED_BY_USAGE" },
   StripeCheckoutError: { statusCode: 502, code: "STRIPE_ERROR" },
   InvalidWebhookSignatureError: { statusCode: 400, code: "INVALID_SIGNATURE" },
+  PlanLimitExceededError: { statusCode: 422, code: "PLAN_LIMIT_EXCEEDED" },
+  NicheInactiveError: { statusCode: 422, code: "NICHE_INACTIVE" },
+  PublishTimesCountMismatchError: { statusCode: 422, code: "PUBLISH_TIMES_COUNT_MISMATCH" },
+  ChannelNotFoundError: { statusCode: 404, code: "CHANNEL_NOT_FOUND" },
+  NicheImmutableError: { statusCode: 422, code: "NICHE_IMMUTABLE" },
+  ChannelNotReadyError: { statusCode: 422, code: "CHANNEL_NOT_READY" },
+  SocialAccountAlreadyConnectedError: { statusCode: 409, code: "SOCIAL_ACCOUNT_ALREADY_CONNECTED" },
+  InvalidOAuthStateError: { statusCode: 400, code: "INVALID_OAUTH_STATE" },
+  OAuthExchangeFailedError: { statusCode: 502, code: "OAUTH_EXCHANGE_FAILED" },
 }
 
 /** Falls back to a generic 500 for anything not explicitly mapped. */

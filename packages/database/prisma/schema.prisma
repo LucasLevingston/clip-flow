@@ -237,6 +237,7 @@ model Channel {
   thumbnailEnabled Boolean          @default(true) @map("thumbnail_enabled")
   status           ChannelStatus    @default(DRAFT)
   createdAt        DateTime         @default(now()) @map("created_at")
+  deletedAt        DateTime?        @map("deleted_at")
 
   tenant          Tenant           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   niche           Niche            @relation(fields: [nicheId], references: [id], onDelete: Restrict)

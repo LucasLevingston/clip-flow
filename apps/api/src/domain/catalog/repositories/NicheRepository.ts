@@ -14,4 +14,6 @@ export interface NicheListResult {
 export interface NicheRepository {
   findActivePaginated(filter: NicheListFilter): Promise<NicheListResult>
   findActiveById(id: string): Promise<Niche | null>
+  /** Unfiltered by status — used where a niche referenced by existing data must still resolve (e.g. Channel list). */
+  findById(id: string): Promise<Niche | null>
 }

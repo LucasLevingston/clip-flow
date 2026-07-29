@@ -3,6 +3,6 @@ import type { ChannelUsageProvider } from "../../domain/billing/repositories/Cha
 
 export class PrismaChannelUsageProvider implements ChannelUsageProvider {
   async countByTenant(tenantId: string): Promise<number> {
-    return prisma.channel.count({ where: { tenantId } })
+    return prisma.channel.count({ where: { tenantId, deletedAt: null } })
   }
 }

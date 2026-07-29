@@ -43,4 +43,9 @@ export class NichePrismaRepository implements NicheRepository {
     const record = await prisma.niche.findFirst({ where: { id, status: "ACTIVE" } })
     return record ? toDomain(record) : null
   }
+
+  async findById(id: string): Promise<Niche | null> {
+    const record = await prisma.niche.findUnique({ where: { id } })
+    return record ? toDomain(record) : null
+  }
 }

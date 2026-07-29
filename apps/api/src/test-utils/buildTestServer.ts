@@ -9,16 +9,37 @@ import { RefreshAccessTokenUseCase } from "../application/use-cases/identity/Ref
 import { RegisterTenantUseCase } from "../application/use-cases/identity/RegisterTenantUseCase"
 import { buildServer } from "../interface/http/buildServer"
 import { buildBillingTestDeps } from "./buildBillingTestDeps"
+import { buildChannelManagementTestDeps } from "./buildChannelManagementTestDeps"
 import { buildIdentityTestContext } from "./buildIdentityTestContext"
+import { buildSocialAccountTestDeps } from "./buildSocialAccountTestDeps"
+import { FakeChannelUsageProvider } from "./fakes/FakeChannelUsageProvider"
+import { InMemoryChannelRepository } from "./fakes/InMemoryChannelRepository"
 import { InMemoryNicheRepository } from "./fakes/InMemoryNicheRepository"
 
 /** Wires a full Fastify instance against in-memory fakes — no real I/O. */
 export function buildTestServer() {
   const ctx = buildIdentityTestContext()
   const nicheRepository = new InMemoryNicheRepository()
+  const channelRepository = new InMemoryChannelRepository()
+  const channelUsageProvider = new FakeChannelUsageProvider(channelRepository)
+
   const billing = buildBillingTestDeps({
     subscriptionRepository: ctx.subscriptionRepository,
     userRepository: ctx.userRepository,
+    channelUsageProvider,
+    jwtService: ctx.jwtService,
+  })
+  const channelManagement = buildChannelManagementTestDeps({
+    nicheRepository,
+    subscriptionRepository: ctx.subscriptionRepository,
+    planRepository: billing.planRepository,
+    channelUsageProvider,
+    channelRepository,
+    jwtService: ctx.jwtService,
+  })
+  const socialAccounts = buildSocialAccountTestDeps({
+    channelRepository,
+    socialAccountRepository: channelManagement.socialAccountRepository,
     jwtService: ctx.jwtService,
   })
 
@@ -43,6 +64,8 @@ export function buildTestServer() {
     },
     subscription: billing.serverDeps.subscription,
     billing: billing.serverDeps.billing,
+    channels: channelManagement.channelRoutesDeps,
+    socialAccounts: socialAccounts.socialAccountRoutesDeps,
   })
 
   return {
@@ -50,7 +73,9 @@ export function buildTestServer() {
     ctx,
     nicheRepository,
     planRepository: billing.planRepository,
-    channelUsageProvider: billing.channelUsageProvider,
+    channelUsageProvider,
     checkoutSessionProvider: billing.checkoutSessionProvider,
+    channelRepository,
+    socialAccountRepository: channelManagement.socialAccountRepository,
   }
 }
