@@ -1,8 +1,12 @@
 import { createQueueProducer, createQueueWorker } from "@clip-flow/worker-kit"
 import type { Job } from "bullmq"
+import { createTriggerDailyGenerationUseCase } from "../infrastructure/createTriggerDailyGenerationUseCase"
 import { startSchedulerQueueConsumer } from "./queueConsumer"
 
 jest.mock("@clip-flow/worker-kit")
+jest.mock("../infrastructure/createTriggerDailyGenerationUseCase", () => ({
+  createTriggerDailyGenerationUseCase: jest.fn(),
+}))
 
 describe("startSchedulerQueueConsumer", () => {
   it("should upsert a repeatable job scheduler on RegisterChannelJob", async () => {
@@ -44,5 +48,25 @@ describe("startSchedulerQueueConsumer", () => {
     } as Job)
 
     expect(removeJobScheduler).toHaveBeenCalledWith("channel-1")
+  })
+
+  it("should route GenerationBatch to the daily generation trigger", async () => {
+    const execute = jest.fn().mockResolvedValue(undefined)
+    const mockCreateTrigger = createTriggerDailyGenerationUseCase as jest.Mock
+    mockCreateTrigger.mockReturnValue({ execute })
+    const mockCreateQueueProducer = createQueueProducer as jest.Mock
+    mockCreateQueueProducer.mockReturnValue({})
+
+    startSchedulerQueueConsumer()
+
+    const mockCreateQueueWorker = createQueueWorker as jest.Mock
+    const processor = mockCreateQueueWorker.mock.calls[0][1] as (job: Job) => Promise<void>
+
+    await processor({
+      name: "GenerationBatch",
+      data: { channelId: "channel-1", tenantId: "tenant-1" },
+    } as Job)
+
+    expect(execute).toHaveBeenCalledWith({ channelId: "channel-1", tenantId: "tenant-1" })
   })
 })

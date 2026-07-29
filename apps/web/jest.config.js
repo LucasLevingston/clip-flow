@@ -24,5 +24,8 @@ const baseConfig = createJestConfig({
 module.exports = async () => {
   const config = await baseConfig()
   config.transformIgnorePatterns = []
+  // MSW's undici-based interceptors leave a keep-alive handle open past teardown (known
+  // issue with this combo); without this the process hangs instead of exiting after tests pass.
+  config.forceExit = true
   return config
 }

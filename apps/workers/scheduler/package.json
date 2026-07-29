@@ -13,6 +13,7 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@clip-flow/database": "workspace:^",
     "@clip-flow/worker-kit": "workspace:^",
     "bullmq": "^5.81.2"
   },

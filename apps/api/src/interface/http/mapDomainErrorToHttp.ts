@@ -24,6 +24,9 @@ const MAPPING: Record<string, HttpErrorMapping> = {
   InvalidOAuthStateError: { statusCode: 400, code: "INVALID_OAUTH_STATE" },
   OAuthExchangeFailedError: { statusCode: 502, code: "OAUTH_EXCHANGE_FAILED" },
   SocialAccountNotFoundError: { statusCode: 404, code: "SOCIAL_ACCOUNT_NOT_FOUND" },
+  SourceVideoNotFoundError: { statusCode: 404, code: "SOURCE_VIDEO_NOT_FOUND" },
+  SourceVideoNotPendingError: { statusCode: 409, code: "SOURCE_VIDEO_NOT_PENDING" },
+  InvalidLicenseInfoError: { statusCode: 422, code: "INVALID_LICENSE_INFO" },
 }
 
 /** Falls back to a generic 500 for anything not explicitly mapped. */

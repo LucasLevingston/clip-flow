@@ -2,6 +2,7 @@ import { createQueueProducer, createQueueWorker } from "@clip-flow/worker-kit"
 import type { Job, Worker } from "bullmq"
 import { SyncChannelScheduleUseCase } from "../application/use-cases/SyncChannelScheduleUseCase"
 import { BullMqRepeatableJobRegistry } from "../infrastructure/BullMqRepeatableJobRegistry"
+import { createTriggerDailyGenerationUseCase } from "../infrastructure/createTriggerDailyGenerationUseCase"
 
 interface ChannelScheduleJobData {
   channelId: string
@@ -10,18 +11,26 @@ interface ChannelScheduleJobData {
 }
 
 /**
- * Consumes the `scheduler` queue's `RegisterChannelJob`/`RemoveChannelJob` commands to keep
- * per-channel BullMQ Job Schedulers in sync (ISSUE-05.F1.S1.T1). The daily
- * `GenerationBatch` trigger those schedulers produce is consumed starting in EPIC-06.
+ * Consumes the `scheduler` queue's `RegisterChannelJob`/`RemoveChannelJob` commands (ISSUE-05.F1.S1.T1)
+ * and the `GenerationBatch` repeatable trigger those commands set up (ISSUE-06.F2.S1.T2).
  */
 export function startSchedulerQueueConsumer(): Worker {
   const queue = createQueueProducer("scheduler")
-  const useCase = new SyncChannelScheduleUseCase({
+  const syncChannelScheduleUseCase = new SyncChannelScheduleUseCase({
     repeatableJobRegistry: new BullMqRepeatableJobRegistry(queue),
   })
+  const triggerDailyGenerationUseCase = createTriggerDailyGenerationUseCase()
 
   return createQueueWorker("scheduler", async (job: Job<ChannelScheduleJobData>) => {
-    await useCase.execute({
+    if (job.name === "GenerationBatch") {
+      await triggerDailyGenerationUseCase.execute({
+        channelId: job.data.channelId,
+        tenantId: job.data.tenantId,
+      })
+      return
+    }
+
+    await syncChannelScheduleUseCase.execute({
       jobName: job.name as "RegisterChannelJob" | "RemoveChannelJob",
       channelId: job.data.channelId,
       tenantId: job.data.tenantId,

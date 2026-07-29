@@ -8,6 +8,7 @@ import { LogoutUseCase } from "../application/use-cases/identity/LogoutUseCase"
 import { RefreshAccessTokenUseCase } from "../application/use-cases/identity/RefreshAccessTokenUseCase"
 import { RegisterTenantUseCase } from "../application/use-cases/identity/RegisterTenantUseCase"
 import { buildServer } from "../interface/http/buildServer"
+import { buildAdminTestDeps } from "./buildAdminTestDeps"
 import { buildBillingTestDeps } from "./buildBillingTestDeps"
 import { buildChannelManagementTestDeps } from "./buildChannelManagementTestDeps"
 import { buildIdentityTestContext } from "./buildIdentityTestContext"
@@ -42,8 +43,10 @@ export function buildTestServer() {
     socialAccountRepository: channelManagement.socialAccountRepository,
     jwtService: ctx.jwtService,
   })
+  const admin = buildAdminTestDeps({ nicheRepository, jwtService: ctx.jwtService })
 
   const app = buildServer({
+    admin: admin.adminRoutesDeps,
     auth: {
       registerTenantUseCase: new RegisterTenantUseCase(ctx),
       loginUseCase: new LoginUseCase(ctx),
@@ -77,5 +80,7 @@ export function buildTestServer() {
     checkoutSessionProvider: billing.checkoutSessionProvider,
     channelRepository,
     socialAccountRepository: channelManagement.socialAccountRepository,
+    sourceVideoRepository: admin.sourceVideoRepository,
+    auditLogRepository: admin.auditLogRepository,
   }
 }

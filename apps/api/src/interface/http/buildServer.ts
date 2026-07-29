@@ -1,6 +1,7 @@
 import cookie from "@fastify/cookie"
 import Fastify, { type FastifyInstance } from "fastify"
 import { healthRoute } from "./healthRoute"
+import { type AdminRoutesDeps, registerAdminRoutes } from "./routes/adminRoutes"
 import { type AuthRoutesDeps, registerAuthRoutes } from "./routes/authRoutes"
 import { type BillingRoutesDeps, registerBillingRoutes } from "./routes/billingRoutes"
 import { type CatalogRoutesDeps, registerCatalogRoutes } from "./routes/catalogRoutes"
@@ -17,6 +18,7 @@ import {
 import "./types"
 
 export interface ServerDeps {
+  admin: AdminRoutesDeps
   auth: AuthRoutesDeps
   members: MemberRoutesDeps
   catalog: CatalogRoutesDeps
@@ -36,6 +38,7 @@ export function buildServer(deps: ServerDeps): FastifyInstance {
   app.register(cookie)
 
   healthRoute(app)
+  registerAdminRoutes(app, deps.admin)
   registerAuthRoutes(app, deps.auth)
   registerMemberRoutes(app, deps.members)
   registerCatalogRoutes(app, deps.catalog)

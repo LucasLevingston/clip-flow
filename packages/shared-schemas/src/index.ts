@@ -15,3 +15,11 @@ export {
   type ChangeChannelStatusInput,
 } from "./channels/changeChannelStatusSchema"
 export { oauthCallbackSchema, type OAuthCallbackInput } from "./social-accounts/oauthCallbackSchema"
+export {
+  ingestSourceVideoSchema,
+  type IngestSourceVideoInput,
+} from "./admin/ingestSourceVideoSchema"
+export {
+  reviewSourceVideoSchema,
+  type ReviewSourceVideoInput,
+} from "./admin/reviewSourceVideoSchema"

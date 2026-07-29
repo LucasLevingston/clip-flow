@@ -1,6 +1,23 @@
 import { http, HttpResponse } from "msw"
+import { channelDetailStore } from "./channelDetailStore"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3333"
+
+function toChannelDto(detail: typeof channelDetailStore.state) {
+  return {
+    id: detail.id,
+    nicheId: detail.nicheId,
+    name: detail.name,
+    language: detail.language,
+    promptOverride: detail.promptOverride,
+    videosPerDay: detail.videosPerDay,
+    publishTimes: detail.publishTimes,
+    generationTime: detail.generationTime,
+    platforms: detail.platforms,
+    thumbnailEnabled: detail.thumbnailEnabled,
+    status: detail.status,
+  }
+}
 
 export const channelsHandlers = [
   http.get(`${API_BASE_URL}/v1/niches`, () =>
@@ -36,4 +53,17 @@ export const channelsHandlers = [
       { status: 201 },
     ),
   ),
+  http.get(`${API_BASE_URL}/v1/channels/:channelId`, () =>
+    HttpResponse.json(channelDetailStore.state),
+  ),
+  http.patch(`${API_BASE_URL}/v1/channels/:channelId`, async ({ request }) => {
+    const body = (await request.json()) as Record<string, unknown>
+    channelDetailStore.state = { ...channelDetailStore.state, ...body }
+    return HttpResponse.json(toChannelDto(channelDetailStore.state))
+  }),
+  http.patch(`${API_BASE_URL}/v1/channels/:channelId/status`, async ({ request }) => {
+    const body = (await request.json()) as { status: "ACTIVE" | "PAUSED" }
+    channelDetailStore.state = { ...channelDetailStore.state, status: body.status }
+    return HttpResponse.json(toChannelDto(channelDetailStore.state))
+  }),
 ]

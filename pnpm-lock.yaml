@@ -322,6 +322,9 @@ importers:
 
   apps/workers/scheduler:
     dependencies:
+      "@clip-flow/database":
+        specifier: workspace:^
+        version: link:../../../packages/database
       "@clip-flow/worker-kit":
         specifier: workspace:^
         version: link:../../../packages/worker-kit

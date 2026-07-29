@@ -1,0 +1,40 @@
+import { prisma, type SourceVideo as PrismaSourceVideo } from "@clip-flow/database"
+import { SourceVideo } from "../../domain/catalog/entities/SourceVideo"
+import type { SourceVideoRepository } from "../../domain/catalog/repositories/SourceVideoRepository"
+import { LicenseInfo } from "../../domain/catalog/value-objects/LicenseInfo"
+
+function toDomain(record: PrismaSourceVideo): SourceVideo {
+  return SourceVideo.create({
+    id: record.id,
+    nicheId: record.nicheId,
+    durationSeconds: record.durationSeconds,
+    license: LicenseInfo.create(record.licenseType, record.licenseReference),
+    status: record.status,
+    storageUrl: record.storageUrl,
+    createdAt: record.createdAt,
+  })
+}
+
+export class SourceVideoPrismaRepository implements SourceVideoRepository {
+  async findById(id: string): Promise<SourceVideo | null> {
+    const record = await prisma.sourceVideo.findUnique({ where: { id } })
+    return record ? toDomain(record) : null
+  }
+
+  async save(sourceVideo: SourceVideo): Promise<void> {
+    const data = {
+      nicheId: sourceVideo.nicheId,
+      durationSeconds: sourceVideo.durationSeconds,
+      licenseType: sourceVideo.license.licenseType,
+      licenseReference: sourceVideo.license.licenseReference,
+      status: sourceVideo.status,
+      storageUrl: sourceVideo.storageUrl,
+    }
+
+    await prisma.sourceVideo.upsert({
+      where: { id: sourceVideo.id },
+      create: { id: sourceVideo.id, ...data },
+      update: data,
+    })
+  }
+}

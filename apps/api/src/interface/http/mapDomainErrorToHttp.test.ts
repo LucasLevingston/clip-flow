@@ -7,6 +7,9 @@ import { NicheImmutableError } from "../../domain/channel-management/errors/Nich
 import { OAuthExchangeFailedError } from "../../domain/channel-management/errors/OAuthExchangeFailedError"
 import { SocialAccountAlreadyConnectedError } from "../../domain/channel-management/errors/SocialAccountAlreadyConnectedError"
 import { SocialAccountNotFoundError } from "../../domain/channel-management/errors/SocialAccountNotFoundError"
+import { InvalidLicenseInfoError } from "../../domain/catalog/errors/InvalidLicenseInfoError"
+import { SourceVideoNotFoundError } from "../../domain/catalog/errors/SourceVideoNotFoundError"
+import { SourceVideoNotPendingError } from "../../domain/catalog/errors/SourceVideoNotPendingError"
 import { EmailAlreadyExistsError } from "../../domain/identity/errors/EmailAlreadyExistsError"
 import { mapDomainErrorToHttp } from "./mapDomainErrorToHttp"
 
@@ -78,6 +81,27 @@ describe("mapDomainErrorToHttp", () => {
     expect(mapDomainErrorToHttp(new SocialAccountNotFoundError("account-1"))).toEqual({
       statusCode: 404,
       code: "SOCIAL_ACCOUNT_NOT_FOUND",
+    })
+  })
+
+  it("should map SourceVideoNotFoundError to 404", () => {
+    expect(mapDomainErrorToHttp(new SourceVideoNotFoundError("source-video-1"))).toEqual({
+      statusCode: 404,
+      code: "SOURCE_VIDEO_NOT_FOUND",
+    })
+  })
+
+  it("should map SourceVideoNotPendingError to 409", () => {
+    expect(mapDomainErrorToHttp(new SourceVideoNotPendingError("source-video-1"))).toEqual({
+      statusCode: 409,
+      code: "SOURCE_VIDEO_NOT_PENDING",
+    })
+  })
+
+  it("should map InvalidLicenseInfoError to 422", () => {
+    expect(mapDomainErrorToHttp(new InvalidLicenseInfoError("empty reference"))).toEqual({
+      statusCode: 422,
+      code: "INVALID_LICENSE_INFO",
     })
   })
 
