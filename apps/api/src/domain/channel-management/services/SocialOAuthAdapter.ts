@@ -8,10 +8,17 @@ export interface OAuthExchangeResult {
   refreshExpiresAt: Date | null
 }
 
+export interface OAuthRefreshResult {
+  accessToken: string
+  refreshToken: string
+  accessTokenExpiresAt: Date
+}
+
 export interface SocialOAuthAdapter {
   getAuthorizationUrl(state: string): string
   exchangeCode(code: string): Promise<OAuthExchangeResult>
+  refreshAccessToken(refreshToken: string): Promise<OAuthRefreshResult>
 }
 
-/** Only platforms with a registered adapter are connectable — TikTok lands in EPIC-04.F2. */
+/** Only platforms with a registered adapter are connectable. */
 export type SocialOAuthAdapterRegistry = Partial<Record<SocialAccountPlatform, SocialOAuthAdapter>>

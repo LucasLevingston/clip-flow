@@ -1,11 +1,12 @@
 import { Channel } from "../../../domain/channel-management/entities/Channel"
 import { ChannelNotFoundError } from "../../../domain/channel-management/errors/ChannelNotFoundError"
 import { TimeOfDay } from "../../../domain/channel-management/value-objects/TimeOfDay"
+import { FakeChannelScheduleEventPublisher } from "../../../test-utils/fakes/FakeChannelScheduleEventPublisher"
 import { InMemoryChannelRepository } from "../../../test-utils/fakes/InMemoryChannelRepository"
 import { DeleteChannelUseCase } from "./DeleteChannelUseCase"
 
 describe("DeleteChannelUseCase", () => {
-  it("should soft-delete the channel", async () => {
+  it("should soft-delete the channel and publish a DELETED schedule event", async () => {
     const channelRepository = new InMemoryChannelRepository()
     await channelRepository.save(
       Channel.create({
@@ -22,16 +23,23 @@ describe("DeleteChannelUseCase", () => {
         thumbnailEnabled: true,
       }),
     )
-    const useCase = new DeleteChannelUseCase({ channelRepository })
+    const channelScheduleEventPublisher = new FakeChannelScheduleEventPublisher()
+    const useCase = new DeleteChannelUseCase({ channelRepository, channelScheduleEventPublisher })
 
     await useCase.execute({ tenantId: "tenant-1", channelId: "channel-1" })
 
     expect(await channelRepository.findById("channel-1")).toBeNull()
+    expect(channelScheduleEventPublisher.removed).toEqual([
+      expect.objectContaining({ channelId: "channel-1" }),
+    ])
   })
 
   it("should reject when the channel does not exist", async () => {
     const channelRepository = new InMemoryChannelRepository()
-    const useCase = new DeleteChannelUseCase({ channelRepository })
+    const useCase = new DeleteChannelUseCase({
+      channelRepository,
+      channelScheduleEventPublisher: new FakeChannelScheduleEventPublisher(),
+    })
 
     await expect(useCase.execute({ tenantId: "tenant-1", channelId: "ghost" })).rejects.toThrow(
       ChannelNotFoundError,
@@ -55,7 +63,10 @@ describe("DeleteChannelUseCase", () => {
         thumbnailEnabled: true,
       }),
     )
-    const useCase = new DeleteChannelUseCase({ channelRepository })
+    const useCase = new DeleteChannelUseCase({
+      channelRepository,
+      channelScheduleEventPublisher: new FakeChannelScheduleEventPublisher(),
+    })
 
     await expect(useCase.execute({ tenantId: "tenant-1", channelId: "channel-1" })).rejects.toThrow(
       ChannelNotFoundError,

@@ -56,6 +56,34 @@ describe("GET /v1/channels/:channelId/social-accounts/:platform/oauth-url", () =
     await app.close()
   })
 
+  it("should return an authorization URL for TikTok", async () => {
+    const { app, nicheRepository } = buildTestServer()
+    nicheRepository.seed(
+      Niche.create({
+        id: "niche-1",
+        name: "Futebol",
+        slug: "futebol",
+        description: "desc",
+        category: "Esportes",
+        previewThumbnailUrl: null,
+        status: "ACTIVE",
+        createdAt: new Date(),
+      }),
+    )
+    const { accessToken, channelId } = await registerOwnerAndCreateChannel(app)
+
+    const response = await app.inject({
+      method: "GET",
+      url: `/v1/channels/${channelId}/social-accounts/tiktok/oauth-url`,
+      headers: { authorization: `Bearer ${accessToken}` },
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.json().url).toContain("state=")
+
+    await app.close()
+  })
+
   it("should reject without an access token", async () => {
     const { app } = buildTestServer()
 
@@ -87,7 +115,7 @@ describe("GET /v1/channels/:channelId/social-accounts/:platform/oauth-url", () =
 
     const response = await app.inject({
       method: "GET",
-      url: `/v1/channels/${channelId}/social-accounts/tiktok/oauth-url`,
+      url: `/v1/channels/${channelId}/social-accounts/twitter/oauth-url`,
       headers: { authorization: `Bearer ${accessToken}` },
     })
 

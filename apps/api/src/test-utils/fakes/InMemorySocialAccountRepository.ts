@@ -5,6 +5,10 @@ import type { SocialAccountPlatform } from "../../domain/channel-management/type
 export class InMemorySocialAccountRepository implements SocialAccountRepository {
   private readonly accountsById = new Map<string, SocialAccount>()
 
+  findById(id: string): Promise<SocialAccount | null> {
+    return Promise.resolve(this.accountsById.get(id) ?? null)
+  }
+
   findByChannelAndPlatform(
     channelId: string,
     platform: SocialAccountPlatform,
@@ -26,6 +30,11 @@ export class InMemorySocialAccountRepository implements SocialAccountRepository 
 
   save(account: SocialAccount): Promise<void> {
     this.accountsById.set(account.id, account)
+    return Promise.resolve()
+  }
+
+  delete(id: string): Promise<void> {
+    this.accountsById.delete(id)
     return Promise.resolve()
   }
 }

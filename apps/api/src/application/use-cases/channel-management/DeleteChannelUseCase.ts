@@ -1,5 +1,6 @@
 import { ChannelNotFoundError } from "../../../domain/channel-management/errors/ChannelNotFoundError"
 import type { ChannelRepository } from "../../../domain/channel-management/repositories/ChannelRepository"
+import type { ChannelScheduleEventPublisher } from "../../../domain/channel-management/services/ChannelScheduleEventPublisher"
 
 export interface DeleteChannelInput {
   tenantId: string
@@ -8,6 +9,7 @@ export interface DeleteChannelInput {
 
 export interface DeleteChannelUseCaseDeps {
   channelRepository: ChannelRepository
+  channelScheduleEventPublisher: ChannelScheduleEventPublisher
 }
 
 /** `DELETE /v1/channels/:channelId` — soft delete, preserves GeneratedVideo history for auditing. */
@@ -21,5 +23,6 @@ export class DeleteChannelUseCase {
     }
 
     await this.deps.channelRepository.delete(channel.id)
+    await this.deps.channelScheduleEventPublisher.removeChannel(channel.id, channel.tenantId)
   }
 }

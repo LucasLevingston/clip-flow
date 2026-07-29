@@ -1,37 +1,9 @@
 import { InvalidChannelStatusTransitionError } from "../errors/InvalidChannelStatusTransitionError"
 import { PublishTimesCountMismatchError } from "../errors/PublishTimesCountMismatchError"
+import type { ChannelConfigInput, ChannelPlatforms, ChannelProps, ChannelStatus } from "../types"
 import type { TimeOfDay } from "../value-objects/TimeOfDay"
 
-export type ChannelPlatforms = "SHORTS_ONLY" | "TIKTOK_ONLY" | "BOTH"
-export type ChannelStatus = "DRAFT" | "ACTIVE" | "PAUSED"
-
-export interface ChannelProps {
-  id: string
-  tenantId: string
-  nicheId: string
-  name: string
-  language: string
-  promptOverride: string | null
-  videosPerDay: number
-  publishTimes: TimeOfDay[]
-  generationTime: TimeOfDay
-  platforms: ChannelPlatforms
-  thumbnailEnabled: boolean
-  status: ChannelStatus
-  createdAt: Date
-}
-
-export type ChannelConfigInput = Pick<
-  ChannelProps,
-  | "name"
-  | "language"
-  | "promptOverride"
-  | "videosPerDay"
-  | "publishTimes"
-  | "generationTime"
-  | "platforms"
-  | "thumbnailEnabled"
->
+export type { ChannelConfigInput, ChannelPlatforms, ChannelProps, ChannelStatus }
 
 /** Aggregate root — see domain/entities-value-objects.md and ADR-0011. `nicheId` has no setter: immutable by construction. */
 export class Channel {
@@ -121,5 +93,12 @@ export class Channel {
       throw new InvalidChannelStatusTransitionError(this.props.status, "PAUSED")
     }
     return new Channel({ ...this.props, status: "PAUSED" })
+  }
+
+  revertToDraft(): Channel {
+    if (this.props.status === "DRAFT") {
+      throw new InvalidChannelStatusTransitionError(this.props.status, "DRAFT")
+    }
+    return new Channel({ ...this.props, status: "DRAFT" })
   }
 }

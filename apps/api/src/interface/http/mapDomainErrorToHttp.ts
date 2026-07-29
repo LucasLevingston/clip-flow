@@ -23,6 +23,7 @@ const MAPPING: Record<string, HttpErrorMapping> = {
   SocialAccountAlreadyConnectedError: { statusCode: 409, code: "SOCIAL_ACCOUNT_ALREADY_CONNECTED" },
   InvalidOAuthStateError: { statusCode: 400, code: "INVALID_OAUTH_STATE" },
   OAuthExchangeFailedError: { statusCode: 502, code: "OAUTH_EXCHANGE_FAILED" },
+  SocialAccountNotFoundError: { statusCode: 404, code: "SOCIAL_ACCOUNT_NOT_FOUND" },
 }
 
 /** Falls back to a generic 500 for anything not explicitly mapped. */

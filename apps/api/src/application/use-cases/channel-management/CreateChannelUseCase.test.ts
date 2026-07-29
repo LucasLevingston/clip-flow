@@ -6,6 +6,7 @@ import { PlanLimitsPolicy } from "../../../domain/billing/policies/PlanLimitsPol
 import { NicheInactiveError } from "../../../domain/channel-management/errors/NicheInactiveError"
 import { ChannelFactory } from "../../../domain/channel-management/factories/ChannelFactory"
 import { PublishSlotAllocator } from "../../../domain/channel-management/services/PublishSlotAllocator"
+import { FakeChannelScheduleEventPublisher } from "../../../test-utils/fakes/FakeChannelScheduleEventPublisher"
 import { FakeChannelUsageProvider } from "../../../test-utils/fakes/FakeChannelUsageProvider"
 import { FakeIdGenerator } from "../../../test-utils/fakes/FakeIdGenerator"
 import { InMemoryChannelRepository } from "../../../test-utils/fakes/InMemoryChannelRepository"
@@ -21,6 +22,7 @@ function buildUseCase() {
   const channelUsageProvider = new FakeChannelUsageProvider()
   const channelRepository = new InMemoryChannelRepository()
   const channelFactory = new ChannelFactory(new PublishSlotAllocator(), new PlanLimitsPolicy())
+  const channelScheduleEventPublisher = new FakeChannelScheduleEventPublisher()
   const useCase = new CreateChannelUseCase({
     nicheRepository,
     subscriptionRepository,
@@ -29,6 +31,7 @@ function buildUseCase() {
     channelFactory,
     channelRepository,
     idGenerator: new FakeIdGenerator(),
+    channelScheduleEventPublisher,
   })
 
   nicheRepository.seed(
@@ -61,6 +64,7 @@ function buildUseCase() {
     planRepository,
     channelUsageProvider,
     channelRepository,
+    channelScheduleEventPublisher,
   }
 }
 
@@ -101,7 +105,7 @@ function baseInput(overrides: Partial<Parameters<CreateChannelUseCase["execute"]
 
 describe("CreateChannelUseCase", () => {
   it("should create a channel in DRAFT with auto-allocated publish times", async () => {
-    const { useCase, subscriptionRepository } = buildUseCase()
+    const { useCase, subscriptionRepository, channelScheduleEventPublisher } = buildUseCase()
     await seedSubscription(subscriptionRepository, "tenant-1", "plan-1")
 
     const result = await useCase.execute(baseInput())
@@ -109,6 +113,10 @@ describe("CreateChannelUseCase", () => {
     expect(result.status).toBe("DRAFT")
     expect(result.publishTimes).toHaveLength(2)
     expect(result.nicheId).toBe("niche-1")
+    expect(channelScheduleEventPublisher.registered).toEqual([])
+    expect(channelScheduleEventPublisher.removed).toEqual([
+      expect.objectContaining({ channelId: result.id }),
+    ])
   })
 
   it("should reject when the niche is not active", async () => {

@@ -79,4 +79,29 @@ describe("GetSocialAccountOAuthUrlUseCase", () => {
       useCase.execute({ tenantId: "tenant-1", channelId: "channel-1", platform: "YOUTUBE" }),
     ).rejects.toThrow(SocialAccountAlreadyConnectedError)
   })
+
+  it("should allow requesting a new URL when the existing account needs reauth", async () => {
+    const { useCase, socialAccountRepository } = await buildScenario()
+    await socialAccountRepository.save(
+      SocialAccount.create({
+        id: "account-1",
+        channelId: "channel-1",
+        platform: "YOUTUBE",
+        externalAccountId: "yt-1",
+        status: "NEEDS_REAUTH",
+        encryptedTokens: Buffer.from("x"),
+        tokenKeyVersion: 1,
+        refreshExpiresAt: null,
+        createdAt: new Date(),
+      }),
+    )
+
+    const result = await useCase.execute({
+      tenantId: "tenant-1",
+      channelId: "channel-1",
+      platform: "YOUTUBE",
+    })
+
+    expect(result.url).toContain("https://oauth.test.local/authorize?state=")
+  })
 })

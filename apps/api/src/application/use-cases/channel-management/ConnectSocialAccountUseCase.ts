@@ -1,10 +1,10 @@
-import type { Channel } from "../../../domain/channel-management/entities/Channel"
 import { ChannelNotFoundError } from "../../../domain/channel-management/errors/ChannelNotFoundError"
 import { InvalidOAuthStateError } from "../../../domain/channel-management/errors/InvalidOAuthStateError"
 import { SocialAccountAlreadyConnectedError } from "../../../domain/channel-management/errors/SocialAccountAlreadyConnectedError"
 import type { SocialAccountFactory } from "../../../domain/channel-management/factories/SocialAccountFactory"
 import type { ChannelRepository } from "../../../domain/channel-management/repositories/ChannelRepository"
 import type { SocialAccountRepository } from "../../../domain/channel-management/repositories/SocialAccountRepository"
+import type { ChannelScheduleEventPublisher } from "../../../domain/channel-management/services/ChannelScheduleEventPublisher"
 import type { IsChannelReadyToPublishSpecification } from "../../../domain/channel-management/services/IsChannelReadyToPublishSpecification"
 import type { OAuthStateSigner } from "../../../domain/channel-management/services/OAuthStateSigner"
 import type { SocialOAuthAdapterRegistry } from "../../../domain/channel-management/services/SocialOAuthAdapter"
@@ -13,6 +13,7 @@ import type {
   SocialAccountStatus,
 } from "../../../domain/channel-management/types"
 import type { IdGenerator } from "../../../domain/identity/services/IdGenerator"
+import { activateChannelIfReady } from "./activateChannelIfReady"
 import { exchangeOAuthCode } from "./exchangeOAuthCode"
 
 export interface ConnectSocialAccountInput {
@@ -38,6 +39,7 @@ export interface ConnectSocialAccountUseCaseDeps {
   socialAccountFactory: SocialAccountFactory
   isChannelReadyToPublishSpecification: IsChannelReadyToPublishSpecification
   idGenerator: IdGenerator
+  channelScheduleEventPublisher: ChannelScheduleEventPublisher
 }
 
 /** RF-05 — `POST /v1/channels/:channelId/social-accounts/:platform/oauth-callback`. */
@@ -87,7 +89,7 @@ export class ConnectSocialAccountUseCase {
     await this.deps.socialAccountRepository.save(account)
 
     if (channel.status === "DRAFT") {
-      await this.activateIfReady(channel)
+      await activateChannelIfReady(channel, this.deps)
     }
 
     return {
@@ -95,22 +97,6 @@ export class ConnectSocialAccountUseCase {
       platform: account.platform,
       externalAccountId: account.externalAccountId,
       status: account.status,
-    }
-  }
-
-  private async activateIfReady(channel: Channel): Promise<void> {
-    const accounts = await this.deps.socialAccountRepository.findByChannelId(channel.id)
-    const connectedPlatforms = accounts
-      .filter((account) => account.status === "CONNECTED")
-      .map((account) => account.platform)
-
-    if (
-      this.deps.isChannelReadyToPublishSpecification.isSatisfiedBy(
-        channel.platforms,
-        connectedPlatforms,
-      )
-    ) {
-      await this.deps.channelRepository.save(channel.activate())
     }
   }
 }

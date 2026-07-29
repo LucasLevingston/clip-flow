@@ -2,8 +2,10 @@ const nextJest = require("next/jest")
 
 const createJestConfig = nextJest({ dir: "./" })
 
-module.exports = createJestConfig({
+const baseConfig = createJestConfig({
   testEnvironment: "jsdom",
+  testEnvironmentOptions: { customExportConditions: [""] },
+  setupFiles: ["<rootDir>/jest.polyfills.ts"],
   setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   coverageThreshold: {
     global: {
@@ -15,3 +17,12 @@ module.exports = createJestConfig({
   },
   coveragePathIgnorePatterns: ["/node_modules/", "/.next/", "layout\\.tsx$"],
 })
+
+// next/jest hard-codes its own transformIgnorePatterns and ignores the one passed above, so
+// msw's ESM-only transitive deps (e.g. rettime) never get transformed. Patch the resolved
+// config directly — msw ships CJS-incompatible packages that jsdom's Jest run needs transformed.
+module.exports = async () => {
+  const config = await baseConfig()
+  config.transformIgnorePatterns = []
+  return config
+}

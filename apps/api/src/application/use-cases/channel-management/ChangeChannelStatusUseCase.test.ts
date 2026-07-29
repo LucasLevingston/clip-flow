@@ -4,6 +4,7 @@ import { ChannelNotReadyError } from "../../../domain/channel-management/errors/
 import { SocialAccount } from "../../../domain/channel-management/entities/SocialAccount"
 import { IsChannelReadyToPublishSpecification } from "../../../domain/channel-management/services/IsChannelReadyToPublishSpecification"
 import { TimeOfDay } from "../../../domain/channel-management/value-objects/TimeOfDay"
+import { FakeChannelScheduleEventPublisher } from "../../../test-utils/fakes/FakeChannelScheduleEventPublisher"
 import { InMemoryChannelRepository } from "../../../test-utils/fakes/InMemoryChannelRepository"
 import { InMemorySocialAccountRepository } from "../../../test-utils/fakes/InMemorySocialAccountRepository"
 import { ChangeChannelStatusUseCase } from "./ChangeChannelStatusUseCase"
@@ -11,10 +12,12 @@ import { ChangeChannelStatusUseCase } from "./ChangeChannelStatusUseCase"
 async function buildScenario(platforms: "SHORTS_ONLY" | "BOTH" = "SHORTS_ONLY") {
   const channelRepository = new InMemoryChannelRepository()
   const socialAccountRepository = new InMemorySocialAccountRepository()
+  const channelScheduleEventPublisher = new FakeChannelScheduleEventPublisher()
   const useCase = new ChangeChannelStatusUseCase({
     channelRepository,
     socialAccountRepository,
     isChannelReadyToPublishSpecification: new IsChannelReadyToPublishSpecification(),
+    channelScheduleEventPublisher,
   })
 
   await channelRepository.save(
@@ -33,12 +36,13 @@ async function buildScenario(platforms: "SHORTS_ONLY" | "BOTH" = "SHORTS_ONLY") 
     }),
   )
 
-  return { useCase, channelRepository, socialAccountRepository }
+  return { useCase, channelRepository, socialAccountRepository, channelScheduleEventPublisher }
 }
 
 describe("ChangeChannelStatusUseCase", () => {
   it("should activate a DRAFT channel when the required social account is connected", async () => {
-    const { useCase, socialAccountRepository } = await buildScenario()
+    const { useCase, socialAccountRepository, channelScheduleEventPublisher } =
+      await buildScenario()
     await socialAccountRepository.save(
       SocialAccount.create({
         id: "account-1",
@@ -60,6 +64,9 @@ describe("ChangeChannelStatusUseCase", () => {
     })
 
     expect(result.status).toBe("ACTIVE")
+    expect(channelScheduleEventPublisher.registered).toEqual([
+      expect.objectContaining({ channelId: "channel-1" }),
+    ])
   })
 
   it("should reject activating when a required social account is missing", async () => {
@@ -71,7 +78,8 @@ describe("ChangeChannelStatusUseCase", () => {
   })
 
   it("should pause an active channel", async () => {
-    const { useCase, socialAccountRepository } = await buildScenario()
+    const { useCase, socialAccountRepository, channelScheduleEventPublisher } =
+      await buildScenario()
     await socialAccountRepository.save(
       SocialAccount.create({
         id: "account-1",
@@ -94,6 +102,9 @@ describe("ChangeChannelStatusUseCase", () => {
     })
 
     expect(result.status).toBe("PAUSED")
+    expect(channelScheduleEventPublisher.removed).toEqual([
+      expect.objectContaining({ channelId: "channel-1" }),
+    ])
   })
 
   it("should reject when the channel does not exist", async () => {

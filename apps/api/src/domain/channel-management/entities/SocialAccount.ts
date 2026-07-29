@@ -55,4 +55,17 @@ export class SocialAccount {
   get createdAt(): Date {
     return this.props.createdAt
   }
+
+  withRefreshedTokens(encryptedTokens: Buffer, tokenKeyVersion: number): SocialAccount {
+    return new SocialAccount({
+      ...this.props,
+      encryptedTokens,
+      tokenKeyVersion,
+      status: "CONNECTED",
+    })
+  }
+
+  markNeedsReauth(): SocialAccount {
+    return new SocialAccount({ ...this.props, status: "NEEDS_REAUTH" })
+  }
 }

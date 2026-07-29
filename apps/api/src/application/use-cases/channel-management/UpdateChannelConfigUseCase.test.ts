@@ -7,6 +7,7 @@ import { ChannelNotFoundError } from "../../../domain/channel-management/errors/
 import { NicheImmutableError } from "../../../domain/channel-management/errors/NicheImmutableError"
 import { PublishTimesCountMismatchError } from "../../../domain/channel-management/errors/PublishTimesCountMismatchError"
 import { TimeOfDay } from "../../../domain/channel-management/value-objects/TimeOfDay"
+import { FakeChannelScheduleEventPublisher } from "../../../test-utils/fakes/FakeChannelScheduleEventPublisher"
 import { InMemoryChannelRepository } from "../../../test-utils/fakes/InMemoryChannelRepository"
 import { InMemoryPlanRepository } from "../../../test-utils/fakes/InMemoryPlanRepository"
 import { InMemorySubscriptionRepository } from "../../../test-utils/fakes/InMemorySubscriptionRepository"
@@ -16,11 +17,13 @@ async function buildScenario() {
   const channelRepository = new InMemoryChannelRepository()
   const subscriptionRepository = new InMemorySubscriptionRepository()
   const planRepository = new InMemoryPlanRepository()
+  const channelScheduleEventPublisher = new FakeChannelScheduleEventPublisher()
   const useCase = new UpdateChannelConfigUseCase({
     channelRepository,
     subscriptionRepository,
     planRepository,
     planLimitsPolicy: new PlanLimitsPolicy(),
+    channelScheduleEventPublisher,
   })
 
   planRepository.seed(
@@ -61,12 +64,12 @@ async function buildScenario() {
     }),
   )
 
-  return { useCase, channelRepository }
+  return { useCase, channelRepository, channelScheduleEventPublisher }
 }
 
 describe("UpdateChannelConfigUseCase", () => {
   it("should update the channel's name", async () => {
-    const { useCase } = await buildScenario()
+    const { useCase, channelScheduleEventPublisher } = await buildScenario()
 
     const result = await useCase.execute({
       tenantId: "tenant-1",
@@ -76,6 +79,9 @@ describe("UpdateChannelConfigUseCase", () => {
 
     expect(result.name).toBe("Novo Nome")
     expect(result.status).toBe("DRAFT")
+    expect(channelScheduleEventPublisher.removed).toEqual([
+      expect.objectContaining({ channelId: "channel-1" }),
+    ])
   })
 
   it("should update videosPerDay and publishTimes together", async () => {

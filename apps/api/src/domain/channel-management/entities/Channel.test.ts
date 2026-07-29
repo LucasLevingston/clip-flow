@@ -75,4 +75,20 @@ describe("Channel", () => {
 
     expect(paused.activate().status).toBe("ACTIVE")
   })
+
+  it("should revert an ACTIVE channel to DRAFT", () => {
+    const active = buildChannel().activate()
+
+    expect(active.revertToDraft().status).toBe("DRAFT")
+  })
+
+  it("should revert a PAUSED channel to DRAFT", () => {
+    const paused = buildChannel().activate().pause()
+
+    expect(paused.revertToDraft().status).toBe("DRAFT")
+  })
+
+  it("should reject reverting an already DRAFT channel", () => {
+    expect(() => buildChannel().revertToDraft()).toThrow(InvalidChannelStatusTransitionError)
+  })
 })

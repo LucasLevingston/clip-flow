@@ -14,6 +14,7 @@ import { IsChannelReadyToPublishSpecification } from "../domain/channel-manageme
 import { PublishSlotAllocator } from "../domain/channel-management/services/PublishSlotAllocator"
 import type { NicheRepository } from "../domain/catalog/repositories/NicheRepository"
 import type { JwtService } from "../domain/identity/services/JwtService"
+import { FakeChannelScheduleEventPublisher } from "./fakes/FakeChannelScheduleEventPublisher"
 import { FakeIdGenerator } from "./fakes/FakeIdGenerator"
 import { InMemorySocialAccountRepository } from "./fakes/InMemorySocialAccountRepository"
 
@@ -31,9 +32,11 @@ export function buildChannelManagementTestDeps(input: BuildChannelManagementTest
   const { channelRepository } = input
   const socialAccountRepository = new InMemorySocialAccountRepository()
   const channelFactory = new ChannelFactory(new PublishSlotAllocator(), new PlanLimitsPolicy())
+  const channelScheduleEventPublisher = new FakeChannelScheduleEventPublisher()
 
   return {
     socialAccountRepository,
+    channelScheduleEventPublisher,
     channelRoutesDeps: {
       createChannelUseCase: new CreateChannelUseCase({
         nicheRepository: input.nicheRepository,
@@ -43,6 +46,7 @@ export function buildChannelManagementTestDeps(input: BuildChannelManagementTest
         channelFactory,
         channelRepository,
         idGenerator: new FakeIdGenerator(),
+        channelScheduleEventPublisher,
       }),
       listChannelsUseCase: new ListChannelsUseCase({
         channelRepository,
@@ -58,13 +62,18 @@ export function buildChannelManagementTestDeps(input: BuildChannelManagementTest
         subscriptionRepository: input.subscriptionRepository,
         planRepository: input.planRepository,
         planLimitsPolicy: new PlanLimitsPolicy(),
+        channelScheduleEventPublisher,
       }),
       changeChannelStatusUseCase: new ChangeChannelStatusUseCase({
         channelRepository,
         socialAccountRepository,
         isChannelReadyToPublishSpecification: new IsChannelReadyToPublishSpecification(),
+        channelScheduleEventPublisher,
       }),
-      deleteChannelUseCase: new DeleteChannelUseCase({ channelRepository }),
+      deleteChannelUseCase: new DeleteChannelUseCase({
+        channelRepository,
+        channelScheduleEventPublisher,
+      }),
       jwtService: input.jwtService,
     },
   }

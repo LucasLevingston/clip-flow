@@ -9,6 +9,7 @@ import { IsChannelReadyToPublishSpecification } from "../../../domain/channel-ma
 import { TimeOfDay } from "../../../domain/channel-management/value-objects/TimeOfDay"
 import { AesGcmEncryptor } from "../../../infrastructure/crypto/AesGcmEncryptor"
 import { HmacOAuthStateSigner } from "../../../infrastructure/oauth/HmacOAuthStateSigner"
+import { FakeChannelScheduleEventPublisher } from "../../../test-utils/fakes/FakeChannelScheduleEventPublisher"
 import { FakeIdGenerator } from "../../../test-utils/fakes/FakeIdGenerator"
 import { FakeSocialOAuthAdapter } from "../../../test-utils/fakes/FakeSocialOAuthAdapter"
 import { InMemoryChannelRepository } from "../../../test-utils/fakes/InMemoryChannelRepository"
@@ -21,6 +22,7 @@ async function buildScenario(platforms: "SHORTS_ONLY" | "BOTH" = "SHORTS_ONLY") 
   const channelRepository = new InMemoryChannelRepository()
   const socialAccountRepository = new InMemorySocialAccountRepository()
   const oauthAdapters = { YOUTUBE: new FakeSocialOAuthAdapter() }
+  const channelScheduleEventPublisher = new FakeChannelScheduleEventPublisher()
   const useCase = new ConnectSocialAccountUseCase({
     channelRepository,
     socialAccountRepository,
@@ -29,6 +31,7 @@ async function buildScenario(platforms: "SHORTS_ONLY" | "BOTH" = "SHORTS_ONLY") 
     socialAccountFactory: new SocialAccountFactory(new AesGcmEncryptor(randomBytes(32), 1)),
     isChannelReadyToPublishSpecification: new IsChannelReadyToPublishSpecification(),
     idGenerator: new FakeIdGenerator(),
+    channelScheduleEventPublisher,
   })
 
   await channelRepository.save(
@@ -47,7 +50,7 @@ async function buildScenario(platforms: "SHORTS_ONLY" | "BOTH" = "SHORTS_ONLY") 
     }),
   )
 
-  return { useCase, channelRepository, socialAccountRepository }
+  return { useCase, channelRepository, socialAccountRepository, channelScheduleEventPublisher }
 }
 
 function validState() {
@@ -56,7 +59,7 @@ function validState() {
 
 describe("ConnectSocialAccountUseCase", () => {
   it("should connect the account and activate a SHORTS_ONLY channel", async () => {
-    const { useCase, channelRepository } = await buildScenario()
+    const { useCase, channelRepository, channelScheduleEventPublisher } = await buildScenario()
 
     const result = await useCase.execute({
       tenantId: "tenant-1",
@@ -69,10 +72,14 @@ describe("ConnectSocialAccountUseCase", () => {
     expect(result.status).toBe("CONNECTED")
     const channel = await channelRepository.findById("channel-1")
     expect(channel?.status).toBe("ACTIVE")
+    expect(channelScheduleEventPublisher.registered).toEqual([
+      expect.objectContaining({ channelId: "channel-1" }),
+    ])
   })
 
   it("should not activate a BOTH channel until both platforms are connected", async () => {
-    const { useCase, channelRepository } = await buildScenario("BOTH")
+    const { useCase, channelRepository, channelScheduleEventPublisher } =
+      await buildScenario("BOTH")
 
     await useCase.execute({
       tenantId: "tenant-1",
@@ -84,6 +91,8 @@ describe("ConnectSocialAccountUseCase", () => {
 
     const channel = await channelRepository.findById("channel-1")
     expect(channel?.status).toBe("DRAFT")
+    expect(channelScheduleEventPublisher.registered).toEqual([])
+    expect(channelScheduleEventPublisher.removed).toEqual([])
   })
 
   it("should reject when the channel does not exist", async () => {

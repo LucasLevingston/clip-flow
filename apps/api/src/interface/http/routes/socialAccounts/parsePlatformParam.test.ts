@@ -5,8 +5,11 @@ describe("parsePlatformParam", () => {
     expect(parsePlatformParam("youtube")).toBe("YOUTUBE")
   })
 
+  it("should map 'tiktok' to the TIKTOK platform", () => {
+    expect(parsePlatformParam("tiktok")).toBe("TIKTOK")
+  })
+
   it("should return null for an unsupported platform", () => {
-    expect(parsePlatformParam("tiktok")).toBeNull()
     expect(parsePlatformParam("twitter")).toBeNull()
   })
 })

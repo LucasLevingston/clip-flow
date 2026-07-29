@@ -14,6 +14,7 @@ import { PublishSlotAllocator } from "../../domain/channel-management/services/P
 import type { NicheRepository } from "../../domain/catalog/repositories/NicheRepository"
 import type { JwtService } from "../../domain/identity/services/JwtService"
 import { UuidGenerator } from "../auth/UuidGenerator"
+import { BullMqChannelScheduleEventPublisher } from "../queue/BullMqChannelScheduleEventPublisher"
 import { ChannelPrismaRepository } from "../repositories/ChannelPrismaRepository"
 import { SocialAccountPrismaRepository } from "../repositories/SocialAccountPrismaRepository"
 
@@ -30,6 +31,7 @@ export function createChannelManagementDeps(input: CreateChannelManagementDepsIn
   const channelRepository = new ChannelPrismaRepository()
   const socialAccountRepository = new SocialAccountPrismaRepository()
   const channelFactory = new ChannelFactory(new PublishSlotAllocator(), new PlanLimitsPolicy())
+  const channelScheduleEventPublisher = new BullMqChannelScheduleEventPublisher()
 
   return {
     createChannelUseCase: new CreateChannelUseCase({
@@ -40,6 +42,7 @@ export function createChannelManagementDeps(input: CreateChannelManagementDepsIn
       channelFactory,
       channelRepository,
       idGenerator: new UuidGenerator(),
+      channelScheduleEventPublisher,
     }),
     listChannelsUseCase: new ListChannelsUseCase({
       channelRepository,
@@ -55,13 +58,18 @@ export function createChannelManagementDeps(input: CreateChannelManagementDepsIn
       subscriptionRepository: input.subscriptionRepository,
       planRepository: input.planRepository,
       planLimitsPolicy: new PlanLimitsPolicy(),
+      channelScheduleEventPublisher,
     }),
     changeChannelStatusUseCase: new ChangeChannelStatusUseCase({
       channelRepository,
       socialAccountRepository,
       isChannelReadyToPublishSpecification: new IsChannelReadyToPublishSpecification(),
+      channelScheduleEventPublisher,
     }),
-    deleteChannelUseCase: new DeleteChannelUseCase({ channelRepository }),
+    deleteChannelUseCase: new DeleteChannelUseCase({
+      channelRepository,
+      channelScheduleEventPublisher,
+    }),
     jwtService: input.jwtService,
   }
 }

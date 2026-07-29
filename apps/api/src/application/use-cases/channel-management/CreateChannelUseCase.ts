@@ -5,10 +5,12 @@ import { NicheInactiveError } from "../../../domain/channel-management/errors/Ni
 import type { ChannelFactory } from "../../../domain/channel-management/factories/ChannelFactory"
 import type { ChannelRepository } from "../../../domain/channel-management/repositories/ChannelRepository"
 import type { ChannelPlatforms } from "../../../domain/channel-management/entities/Channel"
+import type { ChannelScheduleEventPublisher } from "../../../domain/channel-management/services/ChannelScheduleEventPublisher"
 import { TimeOfDay } from "../../../domain/channel-management/value-objects/TimeOfDay"
 import type { NicheRepository } from "../../../domain/catalog/repositories/NicheRepository"
 import type { IdGenerator } from "../../../domain/identity/services/IdGenerator"
 import { type ChannelDto, mapChannelToDto } from "./mapChannelToDto"
+import { publishChannelScheduleEvent } from "./publishChannelScheduleEvent"
 
 export interface CreateChannelInput {
   tenantId: string
@@ -31,6 +33,7 @@ export interface CreateChannelUseCaseDeps {
   channelFactory: ChannelFactory
   channelRepository: ChannelRepository
   idGenerator: IdGenerator
+  channelScheduleEventPublisher: ChannelScheduleEventPublisher
 }
 
 /** RF-04/RF-06 — `POST /v1/channels`. */
@@ -71,6 +74,7 @@ export class CreateChannelUseCase {
     })
 
     await this.deps.channelRepository.save(channel)
+    await publishChannelScheduleEvent(channel, this.deps.channelScheduleEventPublisher)
     return mapChannelToDto(channel)
   }
 }

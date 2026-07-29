@@ -3,8 +3,10 @@ import { ChannelNotReadyError } from "../../../domain/channel-management/errors/
 import type { ChannelStatus } from "../../../domain/channel-management/entities/Channel"
 import type { ChannelRepository } from "../../../domain/channel-management/repositories/ChannelRepository"
 import type { SocialAccountRepository } from "../../../domain/channel-management/repositories/SocialAccountRepository"
+import type { ChannelScheduleEventPublisher } from "../../../domain/channel-management/services/ChannelScheduleEventPublisher"
 import type { IsChannelReadyToPublishSpecification } from "../../../domain/channel-management/services/IsChannelReadyToPublishSpecification"
 import { type ChannelDto, mapChannelToDto } from "./mapChannelToDto"
+import { publishChannelScheduleEvent } from "./publishChannelScheduleEvent"
 
 export interface ChangeChannelStatusInput {
   tenantId: string
@@ -16,6 +18,7 @@ export interface ChangeChannelStatusUseCaseDeps {
   channelRepository: ChannelRepository
   socialAccountRepository: SocialAccountRepository
   isChannelReadyToPublishSpecification: IsChannelReadyToPublishSpecification
+  channelScheduleEventPublisher: ChannelScheduleEventPublisher
 }
 
 /** RF-14 — `PATCH /v1/channels/:channelId/status`. */
@@ -31,6 +34,7 @@ export class ChangeChannelStatusUseCase {
     if (input.status === "PAUSED") {
       const updated = channel.pause()
       await this.deps.channelRepository.save(updated)
+      await publishChannelScheduleEvent(updated, this.deps.channelScheduleEventPublisher)
       return mapChannelToDto(updated)
     }
 
@@ -50,6 +54,7 @@ export class ChangeChannelStatusUseCase {
 
     const updated = channel.activate()
     await this.deps.channelRepository.save(updated)
+    await publishChannelScheduleEvent(updated, this.deps.channelScheduleEventPublisher)
     return mapChannelToDto(updated)
   }
 }

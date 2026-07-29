@@ -1,9 +1,11 @@
 import type {
   OAuthExchangeResult,
+  OAuthRefreshResult,
   SocialOAuthAdapter,
 } from "../../domain/channel-management/services/SocialOAuthAdapter"
 
 const INVALID_CODE = "invalid-code"
+const INVALID_REFRESH_TOKEN = "invalid-refresh-token"
 
 export class FakeSocialOAuthAdapter implements SocialOAuthAdapter {
   private counter = 0
@@ -23,6 +25,18 @@ export class FakeSocialOAuthAdapter implements SocialOAuthAdapter {
       refreshToken: `refresh-token-${this.counter}`,
       accessTokenExpiresAt: new Date(Date.now() + 60 * 60 * 1000),
       refreshExpiresAt: null,
+    })
+  }
+
+  refreshAccessToken(refreshToken: string): Promise<OAuthRefreshResult> {
+    if (refreshToken === INVALID_REFRESH_TOKEN) {
+      return Promise.reject(new Error("invalid_grant"))
+    }
+    this.counter += 1
+    return Promise.resolve({
+      accessToken: `access-token-${this.counter}`,
+      refreshToken,
+      accessTokenExpiresAt: new Date(Date.now() + 60 * 60 * 1000),
     })
   }
 }

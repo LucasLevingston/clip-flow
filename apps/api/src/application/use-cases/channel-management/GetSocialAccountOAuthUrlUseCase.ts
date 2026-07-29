@@ -37,7 +37,7 @@ export class GetSocialAccountOAuthUrlUseCase {
       input.channelId,
       input.platform,
     )
-    if (existing) {
+    if (existing?.status === "CONNECTED") {
       throw new SocialAccountAlreadyConnectedError(input.platform)
     }
 

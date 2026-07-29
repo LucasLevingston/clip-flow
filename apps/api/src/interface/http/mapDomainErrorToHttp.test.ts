@@ -6,6 +6,7 @@ import { InvalidOAuthStateError } from "../../domain/channel-management/errors/I
 import { NicheImmutableError } from "../../domain/channel-management/errors/NicheImmutableError"
 import { OAuthExchangeFailedError } from "../../domain/channel-management/errors/OAuthExchangeFailedError"
 import { SocialAccountAlreadyConnectedError } from "../../domain/channel-management/errors/SocialAccountAlreadyConnectedError"
+import { SocialAccountNotFoundError } from "../../domain/channel-management/errors/SocialAccountNotFoundError"
 import { EmailAlreadyExistsError } from "../../domain/identity/errors/EmailAlreadyExistsError"
 import { mapDomainErrorToHttp } from "./mapDomainErrorToHttp"
 
@@ -70,6 +71,13 @@ describe("mapDomainErrorToHttp", () => {
     expect(mapDomainErrorToHttp(new OAuthExchangeFailedError("timeout"))).toEqual({
       statusCode: 502,
       code: "OAUTH_EXCHANGE_FAILED",
+    })
+  })
+
+  it("should map SocialAccountNotFoundError to 404", () => {
+    expect(mapDomainErrorToHttp(new SocialAccountNotFoundError("account-1"))).toEqual({
+      statusCode: 404,
+      code: "SOCIAL_ACCOUNT_NOT_FOUND",
     })
   })
 

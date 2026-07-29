@@ -10,8 +10,10 @@ import {
   type ChannelPlatforms,
 } from "../../../domain/channel-management/entities/Channel"
 import type { ChannelRepository } from "../../../domain/channel-management/repositories/ChannelRepository"
+import type { ChannelScheduleEventPublisher } from "../../../domain/channel-management/services/ChannelScheduleEventPublisher"
 import { TimeOfDay } from "../../../domain/channel-management/value-objects/TimeOfDay"
 import { type ChannelDto, mapChannelToDto } from "./mapChannelToDto"
+import { publishChannelScheduleEvent } from "./publishChannelScheduleEvent"
 
 export interface UpdateChannelConfigInput {
   tenantId: string
@@ -32,6 +34,7 @@ export interface UpdateChannelConfigUseCaseDeps {
   subscriptionRepository: SubscriptionRepository
   planRepository: PlanRepository
   planLimitsPolicy: PlanLimitsPolicy
+  channelScheduleEventPublisher: ChannelScheduleEventPublisher
 }
 
 /** RF-06 — `PATCH /v1/channels/:channelId`. Never affects an already-dispatched batch. */
@@ -54,6 +57,7 @@ export class UpdateChannelConfigUseCase {
     const updated = channel.updateConfig(this.resolveConfig(channel, input))
 
     await this.deps.channelRepository.save(updated)
+    await publishChannelScheduleEvent(updated, this.deps.channelScheduleEventPublisher)
     return mapChannelToDto(updated)
   }
 
