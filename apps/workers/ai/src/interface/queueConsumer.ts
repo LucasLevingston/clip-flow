@@ -1,14 +1,15 @@
 import { createQueueWorker } from "@clip-flow/worker-kit"
 import type { Job, Worker } from "bullmq"
+import { createGenerateVideoContentUseCase } from "../infrastructure/createGenerateVideoContentUseCase"
 
-/**
- * Consumes the `ai` queue. Real transcription/highlight-selection/copy
- * logic (GenerateVideoContentUseCase) lands in EPIC-06 — see
- * docs/workers/ai-worker.md.
- */
+interface GenerationScheduledJobData {
+  generatedVideoId: string
+}
+
 export function startAiQueueConsumer(): Worker {
-  return createQueueWorker("ai", (job: Job) => {
-    console.log(`[ai] received job ${job.id}`)
-    return Promise.resolve()
+  const generateVideoContentUseCase = createGenerateVideoContentUseCase()
+
+  return createQueueWorker("ai", async (job: Job<GenerationScheduledJobData>) => {
+    await generateVideoContentUseCase.execute(job.data.generatedVideoId)
   })
 }
