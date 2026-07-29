@@ -1,3 +1,5 @@
+import { GetNicheUseCase } from "./application/use-cases/catalog/GetNicheUseCase"
+import { ListNichesUseCase } from "./application/use-cases/catalog/ListNichesUseCase"
 import { AcceptInvitationUseCase } from "./application/use-cases/identity/AcceptInvitationUseCase"
 import { GetCurrentUserUseCase } from "./application/use-cases/identity/GetCurrentUserUseCase"
 import { InviteMemberUseCase } from "./application/use-cases/identity/InviteMemberUseCase"
@@ -12,8 +14,10 @@ import { RandomSecureTokenGenerator } from "./infrastructure/auth/RandomSecureTo
 import { Sha256RefreshTokenHasher } from "./infrastructure/auth/Sha256RefreshTokenHasher"
 import { SystemClock } from "./infrastructure/auth/SystemClock"
 import { UuidGenerator } from "./infrastructure/auth/UuidGenerator"
+import { createBillingDeps } from "./infrastructure/billing/createBillingDeps"
 import { InvitationPrismaRepository } from "./infrastructure/repositories/InvitationPrismaRepository"
 import { MembershipPrismaRepository } from "./infrastructure/repositories/MembershipPrismaRepository"
+import { NichePrismaRepository } from "./infrastructure/repositories/NichePrismaRepository"
 import { RefreshTokenPrismaRepository } from "./infrastructure/repositories/RefreshTokenPrismaRepository"
 import { SubscriptionPrismaRepository } from "./infrastructure/repositories/SubscriptionPrismaRepository"
 import { TenantPrismaRepository } from "./infrastructure/repositories/TenantPrismaRepository"
@@ -33,11 +37,14 @@ const sessionIssuer = new SessionIssuer({
   clock: new SystemClock(),
 })
 
+const userRepository = new UserPrismaRepository()
+const subscriptionRepository = new SubscriptionPrismaRepository()
+
 const identityDeps = {
-  userRepository: new UserPrismaRepository(),
+  userRepository,
   tenantRepository: new TenantPrismaRepository(),
   membershipRepository: new MembershipPrismaRepository(),
-  subscriptionRepository: new SubscriptionPrismaRepository(),
+  subscriptionRepository,
   refreshTokenRepository,
   invitationRepository: new InvitationPrismaRepository(),
   passwordHasher: new BcryptPasswordHasher(),
@@ -46,6 +53,12 @@ const identityDeps = {
   clock: new SystemClock(),
   sessionIssuer,
 }
+
+const catalogDeps = {
+  nicheRepository: new NichePrismaRepository(),
+}
+
+const billing = createBillingDeps({ subscriptionRepository, userRepository, jwtService })
 
 const app = buildServer({
   auth: {
@@ -61,6 +74,13 @@ const app = buildServer({
     acceptInvitationUseCase: new AcceptInvitationUseCase(identityDeps),
     jwtService,
   },
+  catalog: {
+    listNichesUseCase: new ListNichesUseCase(catalogDeps),
+    getNicheUseCase: new GetNicheUseCase(catalogDeps),
+    jwtService,
+  },
+  subscription: billing.subscription,
+  billing: billing.billing,
 })
 
 const port = process.env.PORT ? Number(process.env.PORT) : 3000

@@ -43,16 +43,37 @@ async function main(): Promise<void> {
   }
 
   const niches = [
-    { name: "Futebol", slug: "futebol", category: "Esportes" },
-    { name: "NBA", slug: "nba", category: "Esportes" },
-    { name: "Valorant", slug: "valorant", category: "Games" },
+    {
+      name: "Futebol",
+      slug: "futebol",
+      category: "Esportes",
+      description: "Melhores momentos e jogadas de futebol.",
+    },
+    {
+      name: "NBA",
+      slug: "nba",
+      category: "Esportes",
+      description: "Melhores momentos e jogadas da NBA.",
+    },
+    {
+      name: "Valorant",
+      slug: "valorant",
+      category: "Games",
+      description: "Highlights e jogadas de Valorant.",
+    },
   ]
 
   for (const niche of niches) {
     const created = await prisma.niche.upsert({
       where: { slug: niche.slug },
       update: {},
-      create: { name: niche.name, slug: niche.slug, status: "ACTIVE" },
+      create: {
+        name: niche.name,
+        slug: niche.slug,
+        category: niche.category,
+        description: niche.description,
+        status: "ACTIVE",
+      },
     })
 
     for (let i = 1; i <= 2; i += 1) {

@@ -2,12 +2,21 @@ import cookie from "@fastify/cookie"
 import Fastify, { type FastifyInstance } from "fastify"
 import { healthRoute } from "./healthRoute"
 import { type AuthRoutesDeps, registerAuthRoutes } from "./routes/authRoutes"
+import { type BillingRoutesDeps, registerBillingRoutes } from "./routes/billingRoutes"
+import { type CatalogRoutesDeps, registerCatalogRoutes } from "./routes/catalogRoutes"
 import { type MemberRoutesDeps, registerMemberRoutes } from "./routes/memberRoutes"
+import {
+  type SubscriptionRoutesDeps,
+  registerSubscriptionRoutes,
+} from "./routes/subscriptionRoutes"
 import "./types"
 
 export interface ServerDeps {
   auth: AuthRoutesDeps
   members: MemberRoutesDeps
+  catalog: CatalogRoutesDeps
+  subscription: SubscriptionRoutesDeps
+  billing: BillingRoutesDeps
 }
 
 /**
@@ -22,6 +31,9 @@ export function buildServer(deps: ServerDeps): FastifyInstance {
   healthRoute(app)
   registerAuthRoutes(app, deps.auth)
   registerMemberRoutes(app, deps.members)
+  registerCatalogRoutes(app, deps.catalog)
+  registerSubscriptionRoutes(app, deps.subscription)
+  registerBillingRoutes(app, deps.billing)
 
   return app
 }

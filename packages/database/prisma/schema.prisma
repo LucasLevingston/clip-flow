@@ -111,11 +111,12 @@ enum SubscriptionStatus {
 }
 
 model Plan {
-  id                        String @id @default(uuid())
-  name                      String @unique
-  maxChannels               Int    @map("max_channels")
-  maxVideosPerDayPerChannel Int    @map("max_videos_per_day_per_channel")
-  priceCents                Int    @map("price_cents")
+  id                        String  @id @default(uuid())
+  name                      String  @unique
+  maxChannels               Int     @map("max_channels")
+  maxVideosPerDayPerChannel Int     @map("max_videos_per_day_per_channel")
+  priceCents                Int     @map("price_cents")
+  stripePriceId             String? @unique @map("stripe_price_id")
 
   subscriptions Subscription[]
 
@@ -123,12 +124,14 @@ model Plan {
 }
 
 model Subscription {
-  id               String             @id @default(uuid())
-  tenantId         String             @unique @map("tenant_id")
-  planId           String             @map("plan_id")
-  status           SubscriptionStatus
-  currentPeriodEnd DateTime?          @map("current_period_end")
-  createdAt        DateTime           @default(now()) @map("created_at")
+  id                   String             @id @default(uuid())
+  tenantId             String             @unique @map("tenant_id")
+  planId               String             @map("plan_id")
+  status               SubscriptionStatus
+  currentPeriodEnd     DateTime?          @map("current_period_end")
+  stripeCustomerId     String?            @unique @map("stripe_customer_id")
+  stripeSubscriptionId String?            @unique @map("stripe_subscription_id")
+  createdAt            DateTime           @default(now()) @map("created_at")
 
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
   plan   Plan   @relation(fields: [planId], references: [id], onDelete: Restrict)
@@ -145,6 +148,9 @@ model Niche {
   id                     String      @id @default(uuid())
   name                   String
   slug                   String      @unique
+  description            String      @default("")
+  category               String
+  previewThumbnailUrl    String?     @map("preview_thumbnail_url")
   status                 NicheStatus @default(INACTIVE)
   activePromptTemplateId String?     @map("active_prompt_template_id")
   createdAt              DateTime    @default(now()) @map("created_at")

@@ -1,6 +1,8 @@
 # Modelo ER
 
 > Revisado após [ADR-0011](../adr/0011-channel-as-aggregate.md) — `channel` substitui `niche_subscription` + `publish_schedule`; `social_account` migrou de `tenant_id` para `channel_id`; `generated_video` referencia `channel_id`; nova tabela `channel_insights`.
+>
+> Revisado na Sprint 2 (EPIC-02/EPIC-03) para fechar o contrato já documentado em [api/niches-api.md](../api/niches-api.md) e [api/billing-api.md](../api/billing-api.md): `niche` ganha `description`/`category`/`preview_thumbnail_url` (necessários para navegação do catálogo, RF-03); `plan` ganha `stripe_price_id` e `subscription` ganha `stripe_customer_id`/`stripe_subscription_id` (necessários para checkout e sincronização de webhook, RF-08).
 
 ```mermaid
 erDiagram
@@ -52,6 +54,7 @@ erDiagram
     int max_channels
     int max_videos_per_day_per_channel
     int price_cents
+    string stripe_price_id UK "nullable — TRIAL não tem"
   }
   SUBSCRIPTION {
     uuid id PK
@@ -59,12 +62,17 @@ erDiagram
     uuid plan_id FK
     string status
     timestamp current_period_end
+    string stripe_customer_id UK "nullable até 1º checkout"
+    string stripe_subscription_id UK "nullable até 1º checkout"
     timestamp created_at
   }
   NICHE {
     uuid id PK
     string name
     string slug UK
+    string description
+    string category
+    string preview_thumbnail_url "nullable"
     string status
     uuid active_prompt_template_id FK
     timestamp created_at
