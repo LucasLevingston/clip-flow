@@ -13,8 +13,11 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
+    "@clip-flow/database": "workspace:^",
     "@clip-flow/worker-kit": "workspace:^",
-    "bullmq": "^5.81.2"
+    "bullmq": "^5.81.2",
+    "openai": "^7.1.0"
   },
   "devDependencies": {
     "@clip-flow/eslint-config": "workspace:^",
