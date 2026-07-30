@@ -31,3 +31,11 @@ export {
   reviewFlaggedVideoSchema,
   type ReviewFlaggedVideoInput,
 } from "./admin/reviewFlaggedVideoSchema"
+export {
+  listNotificationsQuerySchema,
+  type ListNotificationsQuery,
+} from "./notifications/listNotificationsQuerySchema"
+export {
+  updateNotificationPreferencesSchema,
+  type UpdateNotificationPreferencesInput,
+} from "./notifications/updateNotificationPreferencesSchema"
