@@ -27,6 +27,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install FFmpeg + OpenCV (Video Worker real-binary tests)
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg
+          pip install opencv-python-headless numpy
+
       - name: One-export-per-file boundary check
         run: pnpm check:file-boundaries --all
 

@@ -4,53 +4,60 @@ Todas as variáveis abaixo devem existir em `.env.example` (sem valores reais) n
 
 ## Compartilhadas (API + Workers)
 
-| Variável | Descrição | Obrigatória |
-|---|---|---|
-| `DATABASE_URL` | Connection string Postgres (Supabase) | Sim |
-| `REDIS_URL` | Connection string Redis (BullMQ) | Sim |
-| `APP_ENCRYPTION_KEY` | Chave AES-256-GCM para tokens OAuth | Sim |
-| `JWT_PRIVATE_KEY` / `JWT_PUBLIC_KEY` | Par RSA para assinatura de access token | Sim (API) |
-| `SUPABASE_SERVICE_ROLE_KEY` | Acesso a Supabase Storage | Sim |
-| `SUPABASE_STORAGE_BUCKET_SOURCE` | Bucket de vídeos-fonte | Sim |
-| `SUPABASE_STORAGE_BUCKET_GENERATED` | Bucket de vídeos gerados | Sim |
-| `NODE_ENV` | `development` \| `staging` \| `production` | Sim |
+| Variável                             | Descrição                                   | Obrigatória |
+| ------------------------------------ | ------------------------------------------- | ----------- |
+| `DATABASE_URL`                       | Connection string Postgres (Supabase)       | Sim         |
+| `REDIS_URL`                          | Connection string Redis (BullMQ)            | Sim         |
+| `APP_ENCRYPTION_KEY`                 | Chave AES-256-GCM para tokens OAuth         | Sim         |
+| `JWT_PRIVATE_KEY` / `JWT_PUBLIC_KEY` | Par RSA para assinatura de access token     | Sim (API)   |
+| `SUPABASE_URL`                       | URL do projeto Supabase (client de Storage) | Sim         |
+| `SUPABASE_SERVICE_ROLE_KEY`          | Acesso a Supabase Storage                   | Sim         |
+| `SUPABASE_STORAGE_BUCKET_SOURCE`     | Bucket de vídeos-fonte                      | Sim         |
+| `SUPABASE_STORAGE_BUCKET_GENERATED`  | Bucket de vídeos gerados                    | Sim         |
+| `NODE_ENV`                           | `development` \| `staging` \| `production`  | Sim         |
+
+## Video Worker
+
+| Variável        | Descrição                                                                                                        | Obrigatória             |
+| --------------- | ---------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `PYTHON_BINARY` | Caminho do executável Python usado pelo `OpenCvFocusDetector` ([integrations/opencv.md](integrations/opencv.md)) | Não (default `python3`) |
 
 ## Integrações de IA
 
-| Variável | Usado por |
-|---|---|
-| `ANTHROPIC_API_KEY` | AI Worker ([integrations/claude.md](integrations/claude.md)) |
-| `CLAUDE_MODEL_ID` | AI Worker |
-| `OPENAI_API_KEY` | AI Worker ([integrations/openai.md](integrations/openai.md)), Whisper |
-| `WHISPER_API_KEY` | AI Worker ([integrations/whisper.md](integrations/whisper.md)) |
+| Variável            | Usado por                                                             |
+| ------------------- | --------------------------------------------------------------------- |
+| `ANTHROPIC_API_KEY` | AI Worker ([integrations/claude.md](integrations/claude.md))          |
+| `CLAUDE_MODEL_ID`   | AI Worker                                                             |
+| `OPENAI_API_KEY`    | AI Worker ([integrations/openai.md](integrations/openai.md)), Whisper |
+| `WHISPER_API_KEY`   | AI Worker ([integrations/whisper.md](integrations/whisper.md))        |
 
 ## Plataformas sociais
 
-| Variável | Usado por |
-|---|---|
+| Variável                                                               | Usado por                    |
+| ---------------------------------------------------------------------- | ---------------------------- |
 | `YOUTUBE_CLIENT_ID` / `YOUTUBE_CLIENT_SECRET` / `YOUTUBE_REDIRECT_URI` | API, Upload/Analytics Worker |
-| `TIKTOK_CLIENT_KEY` / `TIKTOK_CLIENT_SECRET` / `TIKTOK_REDIRECT_URI` | API, Upload/Analytics Worker |
+| `TIKTOK_CLIENT_KEY` / `TIKTOK_CLIENT_SECRET` / `TIKTOK_REDIRECT_URI`   | API, Upload/Analytics Worker |
 
 ## Billing
 
-| Variável | Usado por |
-|---|---|
-| `STRIPE_SECRET_KEY` | API |
-| `STRIPE_WEBHOOK_SECRET` | API |
-| `STRIPE_PUBLISHABLE_KEY` | Frontend |
+| Variável                 | Usado por |
+| ------------------------ | --------- |
+| `STRIPE_SECRET_KEY`      | API       |
+| `STRIPE_WEBHOOK_SECRET`  | API       |
+| `STRIPE_PUBLISHABLE_KEY` | Frontend  |
 
 ## E-mail
 
-| Variável | Usado por |
-|---|---|
+| Variável                 | Usado por           |
+| ------------------------ | ------------------- |
 | `EMAIL_PROVIDER_API_KEY` | Notification Worker |
-| `EMAIL_FROM_ADDRESS` | Notification Worker |
+| `EMAIL_FROM_ADDRESS`     | Notification Worker |
 
 ## Frontend (`apps/web`)
 
-| Variável | Descrição |
-|---|---|
-| `NEXT_PUBLIC_API_URL` | URL base da API |
+| Variável                 | Descrição            |
+| ------------------------ | -------------------- |
+| `NEXT_PUBLIC_API_URL`    | URL base da API      |
 | `STRIPE_PUBLISHABLE_KEY` | Chave pública Stripe |
 
 ## Regras

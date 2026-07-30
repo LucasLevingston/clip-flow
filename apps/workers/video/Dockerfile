@@ -16,16 +16,19 @@ COPY tsconfig.base.json ./tsconfig.base.json
 RUN pnpm turbo run build --filter=@clip-flow/worker-video
 
 # dist/main.js is fully bundled (tsup noExternal) — the runner stage needs
-# nothing but that one file, no node_modules.
+# nothing but that one file plus the Python analysis script, no node_modules.
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-# FFmpeg via apk (ADR-0009) — pin to an exact alpine package version once
-# EPIC-06.F4 lands, to avoid silent drift across rebuilds. OpenCV native
-# bindings for FocusDetector (EPIC-06.F4.S1.T2) go in this stage too then.
-RUN apk add --no-cache ffmpeg && \
+# FFmpeg (ADR-0009) + Python/OpenCV for FocusDetector (EPIC-06.F4.S1.T2) —
+# OpenCV runs as a separate Python process invoked via child_process, not a
+# native Node binding (simpler dependency surface, more stable across
+# rebuilds — see docs/integrations/opencv.md).
+RUN apk add --no-cache ffmpeg python3 py3-opencv py3-numpy && \
     addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 worker
 COPY --from=installer /app/apps/workers/video/dist ./dist
+COPY --from=pruner /app/apps/workers/video/scripts ./scripts
+COPY --from=pruner /app/apps/workers/video/models ./models
 USER worker
 EXPOSE 3000
 CMD ["node", "dist/main.js"]
