@@ -319,6 +319,7 @@ model GeneratedVideo {
   thumbnailUrl       String?              @map("thumbnail_url")
   finalAssetUrl      String?              @map("final_asset_url")
   failureReason      String?              @map("failure_reason")
+  flagReason         String?              @map("flag_reason")
   createdAt          DateTime             @default(now()) @map("created_at")
   updatedAt          DateTime             @updatedAt @map("updated_at")
 

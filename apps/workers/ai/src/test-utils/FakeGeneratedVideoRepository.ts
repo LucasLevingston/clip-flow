@@ -10,6 +10,7 @@ interface StoredGeneratedVideo extends GeneratedVideoSnapshot {
   highlight?: HighlightSelection
   copy?: VideoCopy
   failureReason?: string
+  flagReason?: string
 }
 
 export class FakeGeneratedVideoRepository implements GeneratedVideoRepository {

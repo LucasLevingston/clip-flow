@@ -60,15 +60,14 @@ export async function generateVideoContent(
     })
 
     if (shouldFlagForModeration(contentFlags)) {
+      const flagReason = contentFlags.join(", ")
       await deps.generatedVideoRepository.updateStatus(generatedVideoId, {
         status: "PENDING_MODERATION",
         highlight,
         copy,
+        flagReason,
       })
-      await deps.notificationPublisher.publishFlaggedForModeration({
-        generatedVideoId,
-        flagReason: contentFlags.join(", "),
-      })
+      await deps.notificationPublisher.publishFlaggedForModeration({ generatedVideoId, flagReason })
       return
     }
 

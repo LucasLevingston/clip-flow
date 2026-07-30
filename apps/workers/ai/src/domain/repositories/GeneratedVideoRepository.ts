@@ -15,6 +15,7 @@ export interface GeneratedVideoStatusPatch {
   highlight?: HighlightSelection
   copy?: VideoCopy
   failureReason?: string
+  flagReason?: string
 }
 
 export interface GeneratedVideoRepository {

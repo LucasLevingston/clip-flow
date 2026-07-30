@@ -1,9 +1,13 @@
 import { IngestSourceVideoUseCase } from "../../application/use-cases/catalog/IngestSourceVideoUseCase"
 import { ReviewSourceVideoUseCase } from "../../application/use-cases/catalog/ReviewSourceVideoUseCase"
+import { ListModerationQueueUseCase } from "../../application/use-cases/content-generation/ListModerationQueueUseCase"
+import { ReviewFlaggedVideoUseCase } from "../../application/use-cases/content-generation/ReviewFlaggedVideoUseCase"
 import type { NicheRepository } from "../../domain/catalog/repositories/NicheRepository"
 import type { JwtService } from "../../domain/identity/services/JwtService"
 import { UuidGenerator } from "../auth/UuidGenerator"
+import { BullMqVideoContentEventPublisher } from "../queue/BullMqVideoContentEventPublisher"
 import { AuditLogPrismaRepository } from "../repositories/AuditLogPrismaRepository"
+import { GeneratedVideoPrismaRepository } from "../repositories/GeneratedVideoPrismaRepository"
 import { SourceVideoPrismaRepository } from "../repositories/SourceVideoPrismaRepository"
 
 export interface CreateAdminDepsInput {
@@ -11,10 +15,11 @@ export interface CreateAdminDepsInput {
   jwtService: JwtService
 }
 
-/** Composition root helper — wires the real Prisma-backed admin curation flow. */
+/** Composition root helper — wires the real Prisma-backed admin curation + moderation flows. */
 export function createAdminDeps(input: CreateAdminDepsInput) {
   const sourceVideoRepository = new SourceVideoPrismaRepository()
   const auditLogRepository = new AuditLogPrismaRepository()
+  const generatedVideoRepository = new GeneratedVideoPrismaRepository()
 
   return {
     ingestSourceVideoUseCase: new IngestSourceVideoUseCase({
@@ -25,6 +30,13 @@ export function createAdminDeps(input: CreateAdminDepsInput) {
     }),
     reviewSourceVideoUseCase: new ReviewSourceVideoUseCase({
       sourceVideoRepository,
+      auditLogRepository,
+      idGenerator: new UuidGenerator(),
+    }),
+    listModerationQueueUseCase: new ListModerationQueueUseCase({ generatedVideoRepository }),
+    reviewFlaggedVideoUseCase: new ReviewFlaggedVideoUseCase({
+      generatedVideoRepository,
+      videoContentEventPublisher: new BullMqVideoContentEventPublisher(),
       auditLogRepository,
       idGenerator: new UuidGenerator(),
     }),

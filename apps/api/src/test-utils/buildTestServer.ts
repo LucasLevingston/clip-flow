@@ -82,5 +82,7 @@ export function buildTestServer() {
     socialAccountRepository: channelManagement.socialAccountRepository,
     sourceVideoRepository: admin.sourceVideoRepository,
     auditLogRepository: admin.auditLogRepository,
+    generatedVideoRepository: admin.generatedVideoRepository,
+    videoContentEventPublisher: admin.videoContentEventPublisher,
   }
 }

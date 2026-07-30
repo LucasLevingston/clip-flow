@@ -1,0 +1,10 @@
+export type GeneratedVideoStatus =
+  | "SOURCING"
+  | "TRANSCRIBING"
+  | "PENDING_MODERATION"
+  | "CONTENT_READY"
+  | "CUTTING"
+  | "READY_TO_PUBLISH"
+  | "PUBLISHED"
+  | "FAILED"
+  | "REJECTED"

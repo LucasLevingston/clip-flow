@@ -27,6 +27,11 @@ const MAPPING: Record<string, HttpErrorMapping> = {
   SourceVideoNotFoundError: { statusCode: 404, code: "SOURCE_VIDEO_NOT_FOUND" },
   SourceVideoNotPendingError: { statusCode: 409, code: "SOURCE_VIDEO_NOT_PENDING" },
   InvalidLicenseInfoError: { statusCode: 422, code: "INVALID_LICENSE_INFO" },
+  GeneratedVideoNotFoundError: { statusCode: 404, code: "VIDEO_NOT_FOUND" },
+  GeneratedVideoNotPendingModerationError: {
+    statusCode: 409,
+    code: "VIDEO_NOT_PENDING_MODERATION",
+  },
 }
 
 /** Falls back to a generic 500 for anything not explicitly mapped. */

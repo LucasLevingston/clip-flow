@@ -127,6 +127,7 @@ describe("GenerateVideoContentUseCase", () => {
 
     const record = deps.generatedVideoRepository.get("generated-1")
     expect(record?.status).toBe("PENDING_MODERATION")
+    expect(record?.flagReason).toBe("violence, hate-speech")
     expect(deps.notificationPublisher.flagged).toEqual([
       { generatedVideoId: "generated-1", flagReason: "violence, hate-speech" },
     ])

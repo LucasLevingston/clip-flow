@@ -10,6 +10,8 @@ import { SocialAccountNotFoundError } from "../../domain/channel-management/erro
 import { InvalidLicenseInfoError } from "../../domain/catalog/errors/InvalidLicenseInfoError"
 import { SourceVideoNotFoundError } from "../../domain/catalog/errors/SourceVideoNotFoundError"
 import { SourceVideoNotPendingError } from "../../domain/catalog/errors/SourceVideoNotPendingError"
+import { GeneratedVideoNotFoundError } from "../../domain/content-generation/errors/GeneratedVideoNotFoundError"
+import { GeneratedVideoNotPendingModerationError } from "../../domain/content-generation/errors/GeneratedVideoNotPendingModerationError"
 import { EmailAlreadyExistsError } from "../../domain/identity/errors/EmailAlreadyExistsError"
 import { mapDomainErrorToHttp } from "./mapDomainErrorToHttp"
 
@@ -103,6 +105,19 @@ describe("mapDomainErrorToHttp", () => {
       statusCode: 422,
       code: "INVALID_LICENSE_INFO",
     })
+  })
+
+  it("should map GeneratedVideoNotFoundError to 404", () => {
+    expect(mapDomainErrorToHttp(new GeneratedVideoNotFoundError("generated-1"))).toEqual({
+      statusCode: 404,
+      code: "VIDEO_NOT_FOUND",
+    })
+  })
+
+  it("should map GeneratedVideoNotPendingModerationError to 409", () => {
+    expect(
+      mapDomainErrorToHttp(new GeneratedVideoNotPendingModerationError("generated-1")),
+    ).toEqual({ statusCode: 409, code: "VIDEO_NOT_PENDING_MODERATION" })
   })
 
   it("should fall back to a generic 500 for an unmapped Error", () => {
