@@ -13,6 +13,8 @@ import { SourceVideoNotPendingError } from "../../domain/catalog/errors/SourceVi
 import { GeneratedVideoNotFoundError } from "../../domain/content-generation/errors/GeneratedVideoNotFoundError"
 import { GeneratedVideoNotPendingModerationError } from "../../domain/content-generation/errors/GeneratedVideoNotPendingModerationError"
 import { EmailAlreadyExistsError } from "../../domain/identity/errors/EmailAlreadyExistsError"
+import { InvalidNotificationCategoryError } from "../../domain/notifications/errors/InvalidNotificationCategoryError"
+import { NotificationNotFoundError } from "../../domain/notifications/errors/NotificationNotFoundError"
 import { mapDomainErrorToHttp } from "./mapDomainErrorToHttp"
 
 describe("mapDomainErrorToHttp", () => {
@@ -118,6 +120,20 @@ describe("mapDomainErrorToHttp", () => {
     expect(
       mapDomainErrorToHttp(new GeneratedVideoNotPendingModerationError("generated-1")),
     ).toEqual({ statusCode: 409, code: "VIDEO_NOT_PENDING_MODERATION" })
+  })
+
+  it("should map NotificationNotFoundError to 404", () => {
+    expect(mapDomainErrorToHttp(new NotificationNotFoundError("notif-1"))).toEqual({
+      statusCode: 404,
+      code: "NOTIFICATION_NOT_FOUND",
+    })
+  })
+
+  it("should map InvalidNotificationCategoryError to 422", () => {
+    expect(mapDomainErrorToHttp(new InvalidNotificationCategoryError("NotReal"))).toEqual({
+      statusCode: 422,
+      code: "INVALID_CATEGORY",
+    })
   })
 
   it("should fall back to a generic 500 for an unmapped Error", () => {

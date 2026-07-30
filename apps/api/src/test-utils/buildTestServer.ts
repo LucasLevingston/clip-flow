@@ -12,6 +12,7 @@ import { buildAdminTestDeps } from "./buildAdminTestDeps"
 import { buildBillingTestDeps } from "./buildBillingTestDeps"
 import { buildChannelManagementTestDeps } from "./buildChannelManagementTestDeps"
 import { buildIdentityTestContext } from "./buildIdentityTestContext"
+import { buildNotificationTestDeps } from "./buildNotificationTestDeps"
 import { buildSocialAccountTestDeps } from "./buildSocialAccountTestDeps"
 import { FakeChannelUsageProvider } from "./fakes/FakeChannelUsageProvider"
 import { InMemoryChannelRepository } from "./fakes/InMemoryChannelRepository"
@@ -44,6 +45,7 @@ export function buildTestServer() {
     jwtService: ctx.jwtService,
   })
   const admin = buildAdminTestDeps({ nicheRepository, jwtService: ctx.jwtService })
+  const notifications = buildNotificationTestDeps({ jwtService: ctx.jwtService })
 
   const app = buildServer({
     admin: admin.adminRoutesDeps,
@@ -69,6 +71,7 @@ export function buildTestServer() {
     billing: billing.serverDeps.billing,
     channels: channelManagement.channelRoutesDeps,
     socialAccounts: socialAccounts.socialAccountRoutesDeps,
+    notifications: notifications.notificationRoutesDeps,
   })
 
   return {
@@ -84,5 +87,7 @@ export function buildTestServer() {
     auditLogRepository: admin.auditLogRepository,
     generatedVideoRepository: admin.generatedVideoRepository,
     videoContentEventPublisher: admin.videoContentEventPublisher,
+    notificationRepository: notifications.notificationRepository,
+    notificationPreferenceRepository: notifications.notificationPreferenceRepository,
   }
 }

@@ -8,6 +8,10 @@ import { type CatalogRoutesDeps, registerCatalogRoutes } from "./routes/catalogR
 import { type ChannelRoutesDeps, registerChannelRoutes } from "./routes/channelRoutes"
 import { type MemberRoutesDeps, registerMemberRoutes } from "./routes/memberRoutes"
 import {
+  type NotificationRoutesDeps,
+  registerNotificationRoutes,
+} from "./routes/notificationRoutes"
+import {
   type SocialAccountRoutesDeps,
   registerSocialAccountRoutes,
 } from "./routes/socialAccountRoutes"
@@ -26,6 +30,7 @@ export interface ServerDeps {
   billing: BillingRoutesDeps
   channels: ChannelRoutesDeps
   socialAccounts: SocialAccountRoutesDeps
+  notifications: NotificationRoutesDeps
 }
 
 /**
@@ -46,6 +51,7 @@ export function buildServer(deps: ServerDeps): FastifyInstance {
   registerBillingRoutes(app, deps.billing)
   registerChannelRoutes(app, deps.channels)
   registerSocialAccountRoutes(app, deps.socialAccounts)
+  registerNotificationRoutes(app, deps.notifications)
 
   return app
 }

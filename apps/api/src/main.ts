@@ -12,6 +12,7 @@ import { createChannelManagementDeps } from "./infrastructure/channel-management
 import { createSocialAccountDeps } from "./infrastructure/channel-management/createSocialAccountDeps"
 import { createAdminDeps } from "./infrastructure/catalog/createAdminDeps"
 import { createIdentityDeps } from "./infrastructure/identity/createIdentityDeps"
+import { createNotificationDeps } from "./infrastructure/notifications/createNotificationDeps"
 import { NichePrismaRepository } from "./infrastructure/repositories/NichePrismaRepository"
 import { buildServer } from "./interface/http/buildServer"
 
@@ -35,6 +36,7 @@ const channels = createChannelManagementDeps({
 })
 const socialAccounts = createSocialAccountDeps({ jwtService })
 const admin = createAdminDeps({ nicheRepository: catalogDeps.nicheRepository, jwtService })
+const notifications = createNotificationDeps({ jwtService })
 
 const app = buildServer({
   admin,
@@ -60,6 +62,7 @@ const app = buildServer({
   billing: billing.billing,
   channels,
   socialAccounts,
+  notifications,
 })
 
 const port = process.env.PORT ? Number(process.env.PORT) : 3000
