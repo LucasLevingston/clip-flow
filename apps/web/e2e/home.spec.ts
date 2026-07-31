@@ -2,6 +2,15 @@ import { expect, test } from "@playwright/test"
 
 test.describe("Home page", () => {
   test("should render the product heading and the tenant's channel list", async ({ page }) => {
+    await page.route("**/v1/auth/me", (route) =>
+      route.fulfill({
+        json: {
+          user: { id: "user-1", email: "user@clipflow.app", isPlatformAdmin: false },
+          tenant: { id: "tenant-1", name: "Minha Empresa" },
+          role: "OWNER",
+        },
+      }),
+    )
     await page.route("**/v1/channels", (route) =>
       route.fulfill({
         json: {

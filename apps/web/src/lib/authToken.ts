@@ -1,15 +1,24 @@
-let current: string | null = null
+const STORAGE_KEY = "clipflow_access_token"
 
-/**
- * Placeholder in-memory token holder — the real session/auth feature (RF-01/RF-02 login UI)
- * has not landed in `apps/web` yet. `apiClient` depends on this abstraction, not on how the
- * token ends up here, so swapping in real session storage later needs no changes downstream.
- */
+function readPersisted(): string | null {
+  if (typeof window === "undefined") return null
+  return window.localStorage.getItem(STORAGE_KEY)
+}
+
+let current: string | null = readPersisted()
+
+/** Access token only — the refresh token travels solely as an httpOnly cookie (never in JS). */
 export const authToken = {
   get(): string | null {
     return current
   },
   set(token: string | null): void {
     current = token
+    if (typeof window === "undefined") return
+    if (token) {
+      window.localStorage.setItem(STORAGE_KEY, token)
+    } else {
+      window.localStorage.removeItem(STORAGE_KEY)
+    }
   },
 }

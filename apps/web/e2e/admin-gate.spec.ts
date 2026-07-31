@@ -8,6 +8,12 @@ test.describe("Admin route gate", () => {
         json: { error: { code: "UNAUTHORIZED", message: "Missing authentication" } },
       }),
     )
+    await page.route("**/v1/auth/refresh", (route) =>
+      route.fulfill({
+        status: 401,
+        json: { error: { code: "INVALID_REFRESH_TOKEN", message: "no session" } },
+      }),
+    )
   })
 
   test("should block an unauthenticated visitor from /niches", async ({ page }) => {

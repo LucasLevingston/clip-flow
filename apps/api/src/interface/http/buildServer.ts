@@ -1,4 +1,5 @@
 import cookie from "@fastify/cookie"
+import cors from "@fastify/cors"
 import Fastify, { type FastifyInstance } from "fastify"
 import { healthRoute } from "./healthRoute"
 import { type AdminRoutesDeps, registerAdminRoutes } from "./routes/adminRoutes"
@@ -45,6 +46,10 @@ export function buildServer(deps: ServerDeps): FastifyInstance {
   const app = Fastify({ logger: true })
 
   app.register(cookie)
+  app.register(cors, {
+    origin: process.env.WEB_APP_URL ?? "http://localhost:3000",
+    credentials: true,
+  })
 
   healthRoute(app)
   registerAdminRoutes(app, deps.admin)

@@ -4,7 +4,11 @@ const PORT = 3100
 
 export default defineConfig({
   testDir: "./e2e",
-  fullyParallel: true,
+  // A single shared Next dev server backs every test (see webServer below) — running
+  // specs in parallel makes them fight over its on-demand route compilation and causes
+  // flaky timeouts, so keep this serial for the local scaffold.
+  fullyParallel: false,
+  workers: 1,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: "html",

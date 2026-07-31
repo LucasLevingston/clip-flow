@@ -10,4 +10,21 @@ export const authHandlers = [
       role: "OWNER",
     }),
   ),
+  http.post(`${API_BASE_URL}/v1/auth/login`, () =>
+    HttpResponse.json({ accessToken: "fake-access-token" }),
+  ),
+  http.post(`${API_BASE_URL}/v1/auth/register`, () =>
+    HttpResponse.json(
+      {
+        user: { id: "user-1", email: "user@clipflow.app" },
+        tenant: { id: "tenant-1", name: "Minha Empresa" },
+        accessToken: "fake-access-token",
+      },
+      { status: 201 },
+    ),
+  ),
+  http.post(`${API_BASE_URL}/v1/auth/refresh`, () =>
+    HttpResponse.json({ accessToken: "fake-refreshed-token" }),
+  ),
+  http.post(`${API_BASE_URL}/v1/auth/logout`, () => new HttpResponse(null, { status: 204 })),
 ]
