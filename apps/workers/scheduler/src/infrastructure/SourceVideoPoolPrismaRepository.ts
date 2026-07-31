@@ -17,7 +17,13 @@ export class SourceVideoPoolPrismaRepository implements SourceVideoPoolRepositor
         status: "APPROVED",
         generatedVideos: { none: { channelId } },
       },
-      select: { id: true },
+      select: {
+        id: true,
+        durationSeconds: true,
+        createdAt: true,
+        language: true,
+        qualityScore: true,
+      },
       take: limit,
     })
     return records

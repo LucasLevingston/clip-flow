@@ -27,4 +27,9 @@ describe("ingestSourceVideoSchema", () => {
   it("should reject an empty licenseReference", () => {
     expect(() => ingestSourceVideoSchema.parse(validPayload({ licenseReference: "" }))).toThrow()
   })
+
+  it("should accept an optional language", () => {
+    const result = ingestSourceVideoSchema.parse(validPayload({ language: "pt" }))
+    expect(result.language).toBe("pt")
+  })
 })

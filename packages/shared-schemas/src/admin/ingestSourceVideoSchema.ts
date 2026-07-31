@@ -6,6 +6,7 @@ export const ingestSourceVideoSchema = z.object({
   durationSeconds: z.coerce.number().int().positive(),
   licenseType: z.enum(["PUBLIC_DOMAIN", "CREATIVE_COMMONS", "PARTNER_AGREEMENT"]),
   licenseReference: z.string().trim().min(1, "licenseReference é obrigatório"),
+  language: z.string().trim().min(1).optional(),
 })
 
 export type IngestSourceVideoInput = z.infer<typeof ingestSourceVideoSchema>

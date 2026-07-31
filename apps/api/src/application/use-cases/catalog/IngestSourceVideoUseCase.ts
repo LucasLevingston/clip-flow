@@ -16,6 +16,7 @@ export interface IngestSourceVideoInput {
   durationSeconds: number
   licenseType: LicenseType
   licenseReference: string
+  language?: string | undefined
 }
 
 export interface IngestSourceVideoUseCaseDeps {
@@ -41,6 +42,7 @@ export class IngestSourceVideoUseCase {
       durationSeconds: input.durationSeconds,
       license: LicenseInfo.create(input.licenseType, input.licenseReference),
       storageUrl: input.storageUrl,
+      language: input.language ?? null,
     })
     await this.deps.sourceVideoRepository.save(sourceVideo)
 

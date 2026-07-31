@@ -185,6 +185,8 @@ model SourceVideo {
   status           SourceVideoStatus @default(PENDING_REVIEW)
   storageUrl       String            @map("storage_url")
   externalRef      String?           @map("external_ref")
+  language         String?
+  qualityScore     Int?              @map("quality_score")
   createdAt        DateTime          @default(now()) @map("created_at")
 
   niche           Niche            @relation(fields: [nicheId], references: [id], onDelete: Restrict)

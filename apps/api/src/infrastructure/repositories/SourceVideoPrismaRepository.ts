@@ -16,6 +16,8 @@ function toDomain(record: PrismaSourceVideo): SourceVideo {
     status: record.status,
     storageUrl: record.storageUrl,
     externalRef: record.externalRef,
+    language: record.language,
+    qualityScore: record.qualityScore,
     createdAt: record.createdAt,
   })
 }
@@ -52,6 +54,8 @@ export class SourceVideoPrismaRepository implements SourceVideoRepository {
       status: sourceVideo.status,
       storageUrl: sourceVideo.storageUrl,
       externalRef: sourceVideo.externalRef,
+      language: sourceVideo.language,
+      qualityScore: sourceVideo.qualityScore,
     }
 
     await prisma.sourceVideo.upsert({

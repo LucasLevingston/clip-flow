@@ -17,6 +17,7 @@ export class ChannelPrismaReadRepository implements ChannelReadRepository {
       platforms: record.platforms,
       videosPerDay: record.videosPerDay,
       publishTimes: record.publishTimes as string[],
+      language: record.language,
     }
   }
 }

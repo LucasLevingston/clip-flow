@@ -10,6 +10,8 @@ export interface SourceVideoProps {
   status: SourceVideoStatus
   storageUrl: string
   externalRef: string | null
+  language: string | null
+  qualityScore: number | null
   createdAt: Date
 }
 
@@ -18,16 +20,23 @@ export class SourceVideo {
   private constructor(private readonly props: SourceVideoProps) {}
 
   static create(
-    props: Omit<SourceVideoProps, "status" | "createdAt" | "externalRef"> & {
+    props: Omit<
+      SourceVideoProps,
+      "status" | "createdAt" | "externalRef" | "language" | "qualityScore"
+    > & {
       status?: SourceVideoStatus
       createdAt?: Date
       externalRef?: string | null
+      language?: string | null
+      qualityScore?: number | null
     },
   ): SourceVideo {
     return new SourceVideo({
       ...props,
       status: props.status ?? "PENDING_REVIEW",
       externalRef: props.externalRef ?? null,
+      language: props.language ?? null,
+      qualityScore: props.qualityScore ?? null,
       createdAt: props.createdAt ?? new Date(),
     })
   }
@@ -60,15 +69,27 @@ export class SourceVideo {
     return this.props.externalRef
   }
 
+  get language(): string | null {
+    return this.props.language
+  }
+
+  get qualityScore(): number | null {
+    return this.props.qualityScore
+  }
+
   get createdAt(): Date {
     return this.props.createdAt
   }
 
-  approve(): SourceVideo {
+  approve(qualityScore?: number): SourceVideo {
     if (this.props.status !== "PENDING_REVIEW") {
       throw new InvalidSourceVideoStatusTransitionError(this.props.status, "APPROVED")
     }
-    return new SourceVideo({ ...this.props, status: "APPROVED" })
+    return new SourceVideo({
+      ...this.props,
+      status: "APPROVED",
+      qualityScore: qualityScore ?? this.props.qualityScore,
+    })
   }
 
   reject(): SourceVideo {

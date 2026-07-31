@@ -11,6 +11,7 @@ export interface ReviewSourceVideoInput {
   sourceVideoId: string
   decision: "APPROVED" | "REJECTED"
   reason?: string | undefined
+  qualityScore?: number | undefined
 }
 
 export interface ReviewSourceVideoUseCaseDeps {
@@ -32,7 +33,8 @@ export class ReviewSourceVideoUseCase {
       throw new SourceVideoNotPendingError(input.sourceVideoId)
     }
 
-    const reviewed = input.decision === "APPROVED" ? sourceVideo.approve() : sourceVideo.reject()
+    const reviewed =
+      input.decision === "APPROVED" ? sourceVideo.approve(input.qualityScore) : sourceVideo.reject()
     await this.deps.sourceVideoRepository.save(reviewed)
 
     await this.deps.auditLogRepository.save(

@@ -18,6 +18,7 @@ function buildChannel(overrides: Partial<ChannelSnapshot> = {}): ChannelSnapshot
     platforms: "SHORTS_ONLY",
     videosPerDay: 2,
     publishTimes: ["09:00", "18:00"],
+    language: "pt",
     ...overrides,
   }
 }
@@ -152,6 +153,21 @@ describe("TriggerDailyGenerationUseCase", () => {
     expect(publishSpy).toHaveBeenCalledTimes(2)
 
     publishSpy.mockRestore()
+  })
+
+  it("should select the highest-ranked candidates when the pool exceeds videosPerDay (EPIC-02)", async () => {
+    const scenario = buildScenario()
+    scenario.channelReadRepository.seed(buildChannel({ videosPerDay: 2 }))
+    scenario.sourceVideoPoolRepository.seed([
+      { id: "low-quality", qualityScore: 10 },
+      { id: "high-quality", qualityScore: 95 },
+      { id: "mid-quality", qualityScore: 50 },
+    ])
+
+    await scenario.useCase.execute({ channelId: "channel-1", tenantId: "tenant-1" })
+
+    const selectedIds = scenario.generatedVideoRepository.created.map((c) => c.sourceVideoId)
+    expect(selectedIds).toEqual(["high-quality", "mid-quality"])
   })
 
   it("should fall back to now() for a candidate beyond publishTimes (defensive, invariant violation)", async () => {

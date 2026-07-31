@@ -9,6 +9,8 @@ export interface SourceVideoDto {
   licenseReference: string
   status: SourceVideoStatus
   storageUrl: string
+  language: string | null
+  qualityScore: number | null
   createdAt: Date
 }
 
@@ -21,6 +23,8 @@ export function mapSourceVideoToDto(sourceVideo: SourceVideo): SourceVideoDto {
     licenseReference: sourceVideo.license.licenseReference,
     status: sourceVideo.status,
     storageUrl: sourceVideo.storageUrl,
+    language: sourceVideo.language,
+    qualityScore: sourceVideo.qualityScore,
     createdAt: sourceVideo.createdAt,
   }
 }

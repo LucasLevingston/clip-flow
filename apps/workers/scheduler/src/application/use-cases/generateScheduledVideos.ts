@@ -1,6 +1,7 @@
 import { allocateScheduledPublishTimes } from "../../domain/services/allocateScheduledPublishTimes"
 import type { AlertPublisher } from "../../domain/services/AlertPublisher"
 import type { GenerationJobPublisher } from "../../domain/services/GenerationJobPublisher"
+import { rankSourceVideoCandidates } from "../../domain/services/rankSourceVideoCandidates"
 import type { ChannelSnapshot } from "../../domain/repositories/ChannelReadRepository"
 import type { GeneratedVideoRepository } from "../../domain/repositories/GeneratedVideoRepository"
 import type {
@@ -15,26 +16,30 @@ export interface GenerateScheduledVideosDeps {
   alertPublisher: AlertPublisher
 }
 
-/** Allocates a slot per candidate found, alerts on FA1, never lets one video's failure stop the rest. */
+/** How much larger than videosPerDay the fetched candidate pool is before ranking picks the best. */
+const CANDIDATE_POOL_MULTIPLIER = 5
+
+/** Ranks the available pool (EPIC-02) and allocates a slot per selected candidate; alerts on FA1, never lets one video's failure stop the rest. */
 export async function generateScheduledVideos(
   channel: ChannelSnapshot,
   batchRunId: string,
   now: Date,
   deps: GenerateScheduledVideosDeps,
 ): Promise<void> {
-  const candidates = await deps.sourceVideoPoolRepository.findAvailableForChannel(
+  const pool = await deps.sourceVideoPoolRepository.findAvailableForChannel(
     channel.nicheId,
     channel.id,
-    channel.videosPerDay,
+    channel.videosPerDay * CANDIDATE_POOL_MULTIPLIER,
   )
-  if (candidates.length < channel.videosPerDay) {
+  if (pool.length < channel.videosPerDay) {
     await deps.alertPublisher.publishInsufficientPool({
       channelId: channel.id,
       tenantId: channel.tenantId,
       requiredCount: channel.videosPerDay,
-      availableCount: candidates.length,
+      availableCount: pool.length,
     })
   }
+  const candidates = rankSourceVideoCandidates(pool, channel, now).slice(0, channel.videosPerDay)
 
   const scheduledTimes = allocateScheduledPublishTimes(channel.publishTimes, now)
   const context: GenerationContext = { channel, batchRunId, deps }

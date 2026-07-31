@@ -8,6 +8,7 @@ export interface ChannelSnapshot {
   platforms: ChannelPlatforms
   videosPerDay: number
   publishTimes: string[]
+  language: string
 }
 
 export interface ChannelReadRepository {
