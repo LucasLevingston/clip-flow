@@ -62,3 +62,7 @@ export {
   createContentSourceConfigSchema,
   type CreateContentSourceConfigInput,
 } from "./admin/createContentSourceConfigSchema"
+export {
+  channelPipelineQuerySchema,
+  type ChannelPipelineQuery,
+} from "./videos/channelPipelineQuerySchema"

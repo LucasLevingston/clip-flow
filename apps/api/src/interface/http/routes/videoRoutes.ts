@@ -1,11 +1,13 @@
 import type { FastifyInstance } from "fastify"
 import type { ExportVideosUseCase } from "../../../application/use-cases/videos/ExportVideosUseCase"
+import type { GetChannelPipelineUseCase } from "../../../application/use-cases/videos/GetChannelPipelineUseCase"
 import type { GetVideoUseCase } from "../../../application/use-cases/videos/GetVideoUseCase"
 import type { ListVideosUseCase } from "../../../application/use-cases/videos/ListVideosUseCase"
 import type { JwtService } from "../../../domain/identity/services/JwtService"
 import { createAuthMiddleware } from "../middlewares/authMiddleware"
 import { requireRole } from "../middlewares/requireRole"
 import { createExportVideosHandler } from "./videos/exportVideosHandler"
+import { createGetChannelPipelineHandler } from "./videos/getChannelPipelineHandler"
 import { createGetVideoHandler } from "./videos/getVideoHandler"
 import { createListVideosHandler } from "./videos/listVideosHandler"
 
@@ -13,6 +15,7 @@ export interface VideoRoutesDeps {
   listVideosUseCase: ListVideosUseCase
   getVideoUseCase: GetVideoUseCase
   exportVideosUseCase: ExportVideosUseCase
+  getChannelPipelineUseCase: GetChannelPipelineUseCase
   jwtService: JwtService
 }
 
@@ -24,6 +27,12 @@ export function registerVideoRoutes(app: FastifyInstance, deps: VideoRoutesDeps)
     "/v1/videos/export",
     { preHandler: [authMiddleware, requireOwnerOrAdmin] },
     createExportVideosHandler(deps.exportVideosUseCase),
+  )
+
+  app.get(
+    "/v1/videos/pipeline",
+    { preHandler: authMiddleware },
+    createGetChannelPipelineHandler(deps.getChannelPipelineUseCase),
   )
 
   app.get(

@@ -51,6 +51,73 @@ describe("GET /v1/videos", () => {
   })
 })
 
+describe("GET /v1/videos/pipeline", () => {
+  it("should return only the channel's non-terminal videos", async () => {
+    const { app, videoRepository, ctx } = buildTestServer()
+    videoRepository.seedSummary({
+      id: "video-1",
+      channelId: "channel-1",
+      status: "CUTTING",
+      sourceVideoId: "source-1",
+      thumbnailUrl: null,
+      finalAssetUrl: null,
+      scheduledPublishAt: new Date("2026-07-01"),
+      createdAt: new Date("2026-07-01"),
+      publishRecords: [],
+    })
+    videoRepository.seedSummary({
+      id: "video-2",
+      channelId: "channel-1",
+      status: "PUBLISHED",
+      sourceVideoId: "source-2",
+      thumbnailUrl: null,
+      finalAssetUrl: null,
+      scheduledPublishAt: new Date("2026-07-01"),
+      createdAt: new Date("2026-07-01"),
+      publishRecords: [],
+    })
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/v1/videos/pipeline?channelId=channel-1",
+      headers: { authorization: `Bearer ${mintToken(ctx)}` },
+    })
+
+    expect(response.statusCode).toBe(200)
+    expect(response.json()).toHaveLength(1)
+    expect(response.json()[0].id).toBe("video-1")
+
+    await app.close()
+  })
+
+  it("should reject a missing channelId", async () => {
+    const { app, ctx } = buildTestServer()
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/v1/videos/pipeline",
+      headers: { authorization: `Bearer ${mintToken(ctx)}` },
+    })
+
+    expect(response.statusCode).toBe(422)
+
+    await app.close()
+  })
+
+  it("should reject without an access token", async () => {
+    const { app } = buildTestServer()
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/v1/videos/pipeline?channelId=channel-1",
+    })
+
+    expect(response.statusCode).toBe(401)
+
+    await app.close()
+  })
+})
+
 describe("GET /v1/videos/:id", () => {
   it("should return the video detail", async () => {
     const { app, videoRepository, ctx } = buildTestServer()

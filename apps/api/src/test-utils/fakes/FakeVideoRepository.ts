@@ -50,4 +50,13 @@ export class FakeVideoRepository implements VideoRepository {
   findExportRows(): Promise<VideoExportRow[]> {
     return Promise.resolve(this.exportRows)
   }
+
+  findActivePipelineByChannel(_tenantId: string, channelId: string): Promise<VideoSummary[]> {
+    const active = this.summaries.filter(
+      (video) => video.channelId === channelId && !TERMINAL_STATUSES.has(video.status),
+    )
+    return Promise.resolve(active)
+  }
 }
+
+const TERMINAL_STATUSES = new Set(["PUBLISHED", "FAILED", "REJECTED"])

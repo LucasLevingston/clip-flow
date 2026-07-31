@@ -1,4 +1,4 @@
-import { type Prisma, prisma } from "@clip-flow/database"
+import { prisma } from "@clip-flow/database"
 import type {
   FindPaginatedVideosInput,
   PaginatedVideos,
@@ -6,24 +6,14 @@ import type {
   VideoExportRow,
   VideoFilters,
   VideoRepository,
+  VideoSummary,
 } from "../../domain/videos/repositories/VideoRepository"
 import { buildVideoWhere } from "./buildVideoWhere"
 import { mapPublishRecordToExportRow } from "./mapPublishRecordToExportRow"
 import { mapVideoRecordToDetail } from "./mapVideoRecordToDetail"
+import { VIDEO_SUMMARY_SELECT } from "./videoSummarySelect"
 
-const SUMMARY_SELECT = {
-  id: true,
-  channelId: true,
-  status: true,
-  sourceVideoId: true,
-  thumbnailUrl: true,
-  finalAssetUrl: true,
-  scheduledPublishAt: true,
-  createdAt: true,
-  publishRecords: {
-    select: { platform: true, status: true, externalPostId: true, publishedAt: true },
-  },
-} satisfies Prisma.GeneratedVideoSelect
+const TERMINAL_STATUSES = ["PUBLISHED", "FAILED", "REJECTED"] as const
 
 export class VideoPrismaRepository implements VideoRepository {
   async findPaginatedByTenant(input: FindPaginatedVideosInput): Promise<PaginatedVideos> {
@@ -34,7 +24,7 @@ export class VideoPrismaRepository implements VideoRepository {
         orderBy: { createdAt: "desc" },
         skip: (input.page - 1) * input.pageSize,
         take: input.pageSize,
-        select: SUMMARY_SELECT,
+        select: VIDEO_SUMMARY_SELECT,
       }),
       prisma.generatedVideo.count({ where }),
     ])
@@ -70,6 +60,15 @@ export class VideoPrismaRepository implements VideoRepository {
       return null
     }
     return mapVideoRecordToDetail(record)
+  }
+
+  async findActivePipelineByChannel(tenantId: string, channelId: string): Promise<VideoSummary[]> {
+    return prisma.generatedVideo.findMany({
+      where: { tenantId, channelId, status: { notIn: [...TERMINAL_STATUSES] } },
+      orderBy: { createdAt: "asc" },
+      take: 50,
+      select: VIDEO_SUMMARY_SELECT,
+    })
   }
 
   async findExportRows(tenantId: string, filters: VideoFilters): Promise<VideoExportRow[]> {

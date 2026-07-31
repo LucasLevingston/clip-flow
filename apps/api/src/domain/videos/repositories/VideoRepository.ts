@@ -78,4 +78,5 @@ export interface VideoRepository {
   findPaginatedByTenant(input: FindPaginatedVideosInput): Promise<PaginatedVideos>
   findById(tenantId: string, videoId: string): Promise<VideoDetail | null>
   findExportRows(tenantId: string, filters: VideoFilters): Promise<VideoExportRow[]>
+  findActivePipelineByChannel(tenantId: string, channelId: string): Promise<VideoSummary[]>
 }

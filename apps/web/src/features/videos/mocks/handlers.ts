@@ -28,4 +28,19 @@ export const videosHandlers = [
       meta: { page: 1, pageSize: 20, total: 1 },
     }),
   ),
+  http.get(`${API_BASE_URL}/v1/videos/pipeline`, () =>
+    HttpResponse.json([
+      {
+        id: "video-2",
+        channelId: "channel-1",
+        status: "CUTTING",
+        sourceVideoId: "source-2",
+        thumbnailUrl: null,
+        finalAssetUrl: null,
+        scheduledPublishAt: "2026-07-01T09:00:00.000Z",
+        createdAt: "2026-07-01T00:05:00.000Z",
+        publishRecords: [],
+      },
+    ]),
+  ),
 ]
