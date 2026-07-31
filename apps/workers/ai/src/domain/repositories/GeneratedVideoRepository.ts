@@ -16,6 +16,8 @@ export interface GeneratedVideoStatusPatch {
   copy?: VideoCopy
   failureReason?: string
   flagReason?: string
+  highlightPromptTemplateVersion?: number
+  copyPromptTemplateVersion?: number
 }
 
 export interface GeneratedVideoRepository {

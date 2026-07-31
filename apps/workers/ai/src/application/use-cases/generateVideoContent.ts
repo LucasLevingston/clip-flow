@@ -66,6 +66,8 @@ export async function generateVideoContent(
         highlight,
         copy,
         flagReason,
+        highlightPromptTemplateVersion: context.highlightPromptTemplateVersion,
+        copyPromptTemplateVersion: context.copyPromptTemplateVersion,
       })
       await deps.notificationPublisher.publishFlaggedForModeration({ generatedVideoId, flagReason })
       return
@@ -75,6 +77,8 @@ export async function generateVideoContent(
       status: "CONTENT_READY",
       highlight,
       copy,
+      highlightPromptTemplateVersion: context.highlightPromptTemplateVersion,
+      copyPromptTemplateVersion: context.copyPromptTemplateVersion,
     })
     await deps.videoContentEventPublisher.publishContentGenerated({ generatedVideoId })
   } catch (error) {

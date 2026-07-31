@@ -12,7 +12,9 @@ export interface GenerationContext {
   channelInsights: ChannelInsightsSnapshot | null
   usedHighlights: HighlightSelection[]
   highlightPromptTemplate: string
+  highlightPromptTemplateVersion: number
   copyPromptTemplate: string
+  copyPromptTemplateVersion: number
 }
 
 export async function loadGenerationContext(
@@ -55,6 +57,8 @@ export async function loadGenerationContext(
     channelInsights,
     usedHighlights,
     highlightPromptTemplate: highlightTemplate.content,
+    highlightPromptTemplateVersion: highlightTemplate.version,
     copyPromptTemplate,
+    copyPromptTemplateVersion: copyTemplate.version,
   }
 }

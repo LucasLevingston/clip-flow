@@ -1,66 +1,8 @@
-import { FakeAiCompletionProvider } from "../../test-utils/FakeAiCompletionProvider"
-import { FakeAiNotificationPublisher } from "../../test-utils/FakeAiNotificationPublisher"
-import { FakeChannelInsightsRepository } from "../../test-utils/FakeChannelInsightsRepository"
-import { FakeChannelRepository } from "../../test-utils/FakeChannelRepository"
-import { FakeGeneratedVideoRepository } from "../../test-utils/FakeGeneratedVideoRepository"
 import { FakePromptTemplateRepository } from "../../test-utils/FakePromptTemplateRepository"
-import { FakeSourceVideoTranscriber } from "../../test-utils/FakeSourceVideoTranscriber"
-import { FakeVideoContentEventPublisher } from "../../test-utils/FakeVideoContentEventPublisher"
+import { buildGenerateVideoContentTestDeps as buildDeps } from "../../test-utils/buildGenerateVideoContentTestDeps"
 import { HighlightSelection } from "../../domain/value-objects/HighlightSelection"
 import { GeneratedVideoNotFoundError } from "../../domain/errors/GeneratedVideoNotFoundError"
 import { GenerateVideoContentUseCase } from "./GenerateVideoContentUseCase"
-
-function buildDeps() {
-  const generatedVideoRepository = new FakeGeneratedVideoRepository()
-  const channelRepository = new FakeChannelRepository()
-  const promptTemplateRepository = new FakePromptTemplateRepository()
-  const channelInsightsRepository = new FakeChannelInsightsRepository()
-  const transcribeSourceVideoUseCase = new FakeSourceVideoTranscriber()
-  const aiCompletionProvider = new FakeAiCompletionProvider()
-  const videoContentEventPublisher = new FakeVideoContentEventPublisher()
-  const notificationPublisher = new FakeAiNotificationPublisher()
-
-  generatedVideoRepository.seed({
-    id: "generated-1",
-    tenantId: "tenant-1",
-    channelId: "channel-1",
-    sourceVideoId: "source-1",
-    status: "SOURCING",
-  })
-  channelRepository.seed({
-    id: "channel-1",
-    nicheId: "niche-1",
-    language: "pt-BR",
-    promptOverride: null,
-  })
-  promptTemplateRepository.seed("niche-1", "HIGHLIGHT_SELECTION", {
-    content: "select the best part",
-  })
-  promptTemplateRepository.seed("niche-1", "COPY_GENERATION", { content: "write a hook" })
-
-  const useCase = new GenerateVideoContentUseCase({
-    generatedVideoRepository,
-    channelRepository,
-    promptTemplateRepository,
-    channelInsightsRepository,
-    transcribeSourceVideoUseCase,
-    aiCompletionProvider,
-    videoContentEventPublisher,
-    notificationPublisher,
-  })
-
-  return {
-    useCase,
-    generatedVideoRepository,
-    channelRepository,
-    promptTemplateRepository,
-    channelInsightsRepository,
-    transcribeSourceVideoUseCase,
-    aiCompletionProvider,
-    videoContentEventPublisher,
-    notificationPublisher,
-  }
-}
 
 describe("GenerateVideoContentUseCase", () => {
   it("should mark the video CONTENT_READY and publish VideoContentGenerated on the happy path", async () => {
@@ -72,6 +14,8 @@ describe("GenerateVideoContentUseCase", () => {
     expect(record?.status).toBe("CONTENT_READY")
     expect(record?.highlight).toBeDefined()
     expect(record?.copy).toBeDefined()
+    expect(record?.highlightPromptTemplateVersion).toBe(3)
+    expect(record?.copyPromptTemplateVersion).toBe(2)
     expect(deps.videoContentEventPublisher.published).toEqual([{ generatedVideoId: "generated-1" }])
     expect(deps.notificationPublisher.failed).toEqual([])
   })
@@ -128,6 +72,8 @@ describe("GenerateVideoContentUseCase", () => {
     const record = deps.generatedVideoRepository.get("generated-1")
     expect(record?.status).toBe("PENDING_MODERATION")
     expect(record?.flagReason).toBe("violence, hate-speech")
+    expect(record?.highlightPromptTemplateVersion).toBe(3)
+    expect(record?.copyPromptTemplateVersion).toBe(2)
     expect(deps.notificationPublisher.flagged).toEqual([
       { generatedVideoId: "generated-1", flagReason: "violence, hate-speech" },
     ])

@@ -15,7 +15,7 @@ export class PromptTemplatePrismaRepository implements PromptTemplateRepository 
     return prisma.promptTemplate.findFirst({
       where: { nicheId, type },
       orderBy: { version: "desc" },
-      select: { content: true },
+      select: { content: true, version: true },
     })
   }
 }

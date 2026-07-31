@@ -26,6 +26,12 @@ export class GeneratedVideoPrismaRepository implements GeneratedVideoRepository 
         ...(patch.copy ? { copy: serializeCopy(patch.copy) } : {}),
         ...(patch.failureReason ? { failureReason: patch.failureReason } : {}),
         ...(patch.flagReason ? { flagReason: patch.flagReason } : {}),
+        ...(patch.highlightPromptTemplateVersion !== undefined
+          ? { highlightPromptTemplateVersion: patch.highlightPromptTemplateVersion }
+          : {}),
+        ...(patch.copyPromptTemplateVersion !== undefined
+          ? { copyPromptTemplateVersion: patch.copyPromptTemplateVersion }
+          : {}),
       },
     })
   }

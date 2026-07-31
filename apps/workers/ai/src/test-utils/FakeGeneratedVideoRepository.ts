@@ -11,6 +11,8 @@ interface StoredGeneratedVideo extends GeneratedVideoSnapshot {
   copy?: VideoCopy
   failureReason?: string
   flagReason?: string
+  highlightPromptTemplateVersion?: number
+  copyPromptTemplateVersion?: number
 }
 
 export class FakeGeneratedVideoRepository implements GeneratedVideoRepository {
