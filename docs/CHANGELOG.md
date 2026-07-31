@@ -12,6 +12,14 @@ Formato: [Keep a Changelog](https://keepachangelog.com/). Este arquivo registra 
 - Painel "Próximos agendamentos" no dashboard do canal.
 - Ver detalhes em [roadmap/roadmap.md](roadmap/roadmap.md#sprint-mvp-1--fluxo-principal-ponta-a-ponta-happy-path).
 
+### Added — Sprint MVP-2 (Automated Content Pipeline — Core)
+
+- Descoberta de conteúdo por fonte pré-licenciada (RSS/pasta local/API de parceiro), landing como candidato pendente de revisão — curadoria manual continua obrigatória (ADR-0006).
+- Ranking por IA do pool de vídeos-fonte candidatos (qualidade, duração, frescor, idioma) antes da geração diária.
+- Retry automático com backoff exponencial + fila de dead-letter em todas as filas BullMQ.
+- Painel de pipeline em tempo real (polling 5s) no detalhe do canal.
+- Ver detalhes, incluindo escopo explicitamente adiado, em [roadmap/roadmap.md](roadmap/roadmap.md#sprint-mvp-2--automated-content-pipeline-core).
+
 ### Planejamento
 
 - Fase 0 concluída: documentação completa de produto, arquitetura, domínio, banco, APIs, workers, integrações, segurança, testes, backlog e roadmap. Nenhuma implementação iniciada ainda (ver [product/vision.md](product/vision.md)).
