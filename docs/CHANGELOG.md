@@ -4,7 +4,16 @@ Formato: [Keep a Changelog](https://keepachangelog.com/). Este arquivo registra 
 
 ## [Não lançado]
 
+### Added — Sprint MVP-1 (fluxo principal ponta a ponta)
+
+- Sessão real (access token em `localStorage`, refresh token em cookie httpOnly), login/registro pela UI, proteção de rotas via `RequireAuth`.
+- Conexão de contas do YouTube/TikTok pela UI, com fluxo OAuth completo (connect/reauth/disconnect) e callback compartilhado.
+- Disparo manual do Scheduler pelo Dashboard (botão "Run now" por canal).
+- Painel "Próximos agendamentos" no dashboard do canal.
+- Ver detalhes em [roadmap/roadmap.md](roadmap/roadmap.md#sprint-mvp-1--fluxo-principal-ponta-a-ponta-happy-path).
+
 ### Planejamento
+
 - Fase 0 concluída: documentação completa de produto, arquitetura, domínio, banco, APIs, workers, integrações, segurança, testes, backlog e roadmap. Nenhuma implementação iniciada ainda (ver [product/vision.md](product/vision.md)).
 
 <!--
