@@ -50,4 +50,17 @@ export class Niche {
   get createdAt(): Date {
     return this.props.createdAt
   }
+
+  update(patch: {
+    name?: string | undefined
+    description?: string | undefined
+    status?: NicheStatus | undefined
+  }): Niche {
+    return new Niche({
+      ...this.props,
+      name: patch.name ?? this.props.name,
+      description: patch.description ?? this.props.description,
+      status: patch.status ?? this.props.status,
+    })
+  }
 }

@@ -35,6 +35,7 @@ const MAPPING: Record<string, HttpErrorMapping> = {
   NotificationNotFoundError: { statusCode: 404, code: "NOTIFICATION_NOT_FOUND" },
   InvalidNotificationCategoryError: { statusCode: 422, code: "INVALID_CATEGORY" },
   VideoNotFoundError: { statusCode: 404, code: "VIDEO_NOT_FOUND" },
+  SlugAlreadyExistsError: { statusCode: 409, code: "SLUG_ALREADY_EXISTS" },
 }
 
 /** Falls back to a generic 500 for anything not explicitly mapped. */

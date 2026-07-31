@@ -24,6 +24,7 @@ describe("GetCurrentUserUseCase", () => {
     })
 
     expect(result?.user.email).toBe("marina@example.com")
+    expect(result?.user.isPlatformAdmin).toBe(false)
     expect(result?.tenant.name).toBe("Minha Empresa")
     expect(result?.role).toBe("OWNER")
   })

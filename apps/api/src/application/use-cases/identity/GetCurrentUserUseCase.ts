@@ -9,7 +9,7 @@ export interface GetCurrentUserInput {
 }
 
 export interface GetCurrentUserOutput {
-  user: { id: string; email: string }
+  user: { id: string; email: string; isPlatformAdmin: boolean }
   tenant: { id: string; name: string }
   role: MembershipRole
 }
@@ -36,7 +36,7 @@ export class GetCurrentUserUseCase {
     }
 
     return {
-      user: { id: user.id, email: user.email.value },
+      user: { id: user.id, email: user.email.value, isPlatformAdmin: user.isPlatformAdmin },
       tenant: { id: tenant.id, name: tenant.name },
       role: membership.role,
     }

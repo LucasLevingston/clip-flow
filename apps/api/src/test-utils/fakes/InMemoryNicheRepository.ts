@@ -1,5 +1,6 @@
 import type { Niche } from "../../domain/catalog/entities/Niche"
 import type {
+  NicheAdminListFilter,
   NicheListFilter,
   NicheListResult,
   NicheRepository,
@@ -31,5 +32,28 @@ export class InMemoryNicheRepository implements NicheRepository {
 
   findById(id: string): Promise<Niche | null> {
     return Promise.resolve(this.nichesById.get(id) ?? null)
+  }
+
+  findBySlug(slug: string): Promise<Niche | null> {
+    return Promise.resolve(
+      [...this.nichesById.values()].find((niche) => niche.slug === slug) ?? null,
+    )
+  }
+
+  save(niche: Niche): Promise<void> {
+    this.nichesById.set(niche.id, niche)
+    return Promise.resolve()
+  }
+
+  findAllPaginated(filter: NicheAdminListFilter): Promise<NicheListResult> {
+    const matching = [...this.nichesById.values()]
+      .filter((niche) => !filter.status || niche.status === filter.status)
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+
+    const start = (filter.page - 1) * filter.pageSize
+    return Promise.resolve({
+      items: matching.slice(start, start + filter.pageSize),
+      total: matching.length,
+    })
   }
 }
