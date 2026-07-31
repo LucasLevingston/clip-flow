@@ -1,6 +1,12 @@
 import { Queue, type QueueOptions } from "bullmq"
 import IORedis from "ioredis"
 
+/** EPIC-11 (Error Recovery) — every job gets 3 attempts with exponential backoff unless a caller overrides it. */
+const DEFAULT_JOB_OPTIONS = {
+  attempts: 3,
+  backoff: { type: "exponential", delay: 5000 },
+} as const
+
 /**
  * Producer counterpart to `createQueueWorker` — used by services that enqueue
  * jobs onto a worker's named queue without consuming it themselves (e.g. the
@@ -11,5 +17,9 @@ export function createQueueProducer(queueName: string, options?: Partial<QueueOp
     maxRetriesPerRequest: null,
   })
 
-  return new Queue(queueName, { ...options, connection })
+  return new Queue(queueName, {
+    ...options,
+    defaultJobOptions: { ...DEFAULT_JOB_OPTIONS, ...options?.defaultJobOptions },
+    connection,
+  })
 }
