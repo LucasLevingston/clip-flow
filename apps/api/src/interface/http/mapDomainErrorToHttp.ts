@@ -34,6 +34,7 @@ const MAPPING: Record<string, HttpErrorMapping> = {
   },
   NotificationNotFoundError: { statusCode: 404, code: "NOTIFICATION_NOT_FOUND" },
   InvalidNotificationCategoryError: { statusCode: 422, code: "INVALID_CATEGORY" },
+  VideoNotFoundError: { statusCode: 404, code: "VIDEO_NOT_FOUND" },
 }
 
 /** Falls back to a generic 500 for anything not explicitly mapped. */

@@ -39,3 +39,8 @@ export {
   updateNotificationPreferencesSchema,
   type UpdateNotificationPreferencesInput,
 } from "./notifications/updateNotificationPreferencesSchema"
+export { listVideosQuerySchema, type ListVideosQuery } from "./videos/listVideosQuerySchema"
+export {
+  analyticsSummaryQuerySchema,
+  type AnalyticsSummaryQuery,
+} from "./analytics/analyticsSummaryQuerySchema"

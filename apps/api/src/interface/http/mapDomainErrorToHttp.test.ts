@@ -15,6 +15,7 @@ import { GeneratedVideoNotPendingModerationError } from "../../domain/content-ge
 import { EmailAlreadyExistsError } from "../../domain/identity/errors/EmailAlreadyExistsError"
 import { InvalidNotificationCategoryError } from "../../domain/notifications/errors/InvalidNotificationCategoryError"
 import { NotificationNotFoundError } from "../../domain/notifications/errors/NotificationNotFoundError"
+import { VideoNotFoundError } from "../../domain/videos/errors/VideoNotFoundError"
 import { mapDomainErrorToHttp } from "./mapDomainErrorToHttp"
 
 describe("mapDomainErrorToHttp", () => {
@@ -133,6 +134,13 @@ describe("mapDomainErrorToHttp", () => {
     expect(mapDomainErrorToHttp(new InvalidNotificationCategoryError("NotReal"))).toEqual({
       statusCode: 422,
       code: "INVALID_CATEGORY",
+    })
+  })
+
+  it("should map VideoNotFoundError to 404", () => {
+    expect(mapDomainErrorToHttp(new VideoNotFoundError("video-1"))).toEqual({
+      statusCode: 404,
+      code: "VIDEO_NOT_FOUND",
     })
   })
 

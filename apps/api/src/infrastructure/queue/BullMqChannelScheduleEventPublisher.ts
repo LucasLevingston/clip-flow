@@ -5,19 +5,27 @@ import type {
   RegisterChannelScheduleEvent,
 } from "../../domain/channel-management/services/ChannelScheduleEventPublisher"
 
-/** Publishes onto the `scheduler` queue — see ADR-0010, the queue itself is the event bus. */
+/**
+ * Publishes onto the `scheduler` queue (ADR-0010) and, since Sprint 10, also onto the `analytics`
+ * queue so the Analytics Worker keeps its daily ChannelInsights recalculation job in sync.
+ */
 export class BullMqChannelScheduleEventPublisher implements ChannelScheduleEventPublisher {
-  private readonly queue: Queue
-
-  constructor(queue: Queue = createQueueProducer("scheduler")) {
-    this.queue = queue
-  }
+  constructor(
+    private readonly schedulerQueue: Queue = createQueueProducer("scheduler"),
+    private readonly analyticsQueue: Queue = createQueueProducer("analytics"),
+  ) {}
 
   async registerChannel(event: RegisterChannelScheduleEvent): Promise<void> {
-    await this.queue.add("RegisterChannelJob", event)
+    await Promise.all([
+      this.schedulerQueue.add("RegisterChannelJob", event),
+      this.analyticsQueue.add("RegisterChannelJob", event),
+    ])
   }
 
   async removeChannel(channelId: string, tenantId: string): Promise<void> {
-    await this.queue.add("RemoveChannelJob", { channelId, tenantId })
+    await Promise.all([
+      this.schedulerQueue.add("RemoveChannelJob", { channelId, tenantId }),
+      this.analyticsQueue.add("RemoveChannelJob", { channelId, tenantId }),
+    ])
   }
 }

@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify"
 import type { ChangeChannelStatusUseCase } from "../../../application/use-cases/channel-management/ChangeChannelStatusUseCase"
 import type { CreateChannelUseCase } from "../../../application/use-cases/channel-management/CreateChannelUseCase"
 import type { DeleteChannelUseCase } from "../../../application/use-cases/channel-management/DeleteChannelUseCase"
+import type { GetChannelInsightsUseCase } from "../../../application/use-cases/channel-management/GetChannelInsightsUseCase"
 import type { GetChannelUseCase } from "../../../application/use-cases/channel-management/GetChannelUseCase"
 import type { ListChannelsUseCase } from "../../../application/use-cases/channel-management/ListChannelsUseCase"
 import type { UpdateChannelConfigUseCase } from "../../../application/use-cases/channel-management/UpdateChannelConfigUseCase"
@@ -12,6 +13,7 @@ import { createChangeChannelStatusHandler } from "./channels/changeChannelStatus
 import { createCreateChannelHandler } from "./channels/createChannelHandler"
 import { createDeleteChannelHandler } from "./channels/deleteChannelHandler"
 import { createGetChannelHandler } from "./channels/getChannelHandler"
+import { createGetChannelInsightsHandler } from "./channels/getChannelInsightsHandler"
 import { createListChannelsHandler } from "./channels/listChannelsHandler"
 import { createUpdateChannelConfigHandler } from "./channels/updateChannelConfigHandler"
 
@@ -19,6 +21,7 @@ export interface ChannelRoutesDeps {
   createChannelUseCase: CreateChannelUseCase
   listChannelsUseCase: ListChannelsUseCase
   getChannelUseCase: GetChannelUseCase
+  getChannelInsightsUseCase: GetChannelInsightsUseCase
   updateChannelConfigUseCase: UpdateChannelConfigUseCase
   changeChannelStatusUseCase: ChangeChannelStatusUseCase
   deleteChannelUseCase: DeleteChannelUseCase
@@ -48,6 +51,12 @@ export function registerChannelRoutes(app: FastifyInstance, deps: ChannelRoutesD
     "/v1/channels/:channelId",
     { preHandler: authMiddleware },
     createGetChannelHandler(deps.getChannelUseCase),
+  )
+
+  app.get<ChannelIdParams>(
+    "/v1/channels/:channelId/insights",
+    { preHandler: authMiddleware },
+    createGetChannelInsightsHandler(deps.getChannelInsightsUseCase),
   )
 
   app.patch<ChannelIdParams>(

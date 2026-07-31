@@ -2,6 +2,7 @@ import cookie from "@fastify/cookie"
 import Fastify, { type FastifyInstance } from "fastify"
 import { healthRoute } from "./healthRoute"
 import { type AdminRoutesDeps, registerAdminRoutes } from "./routes/adminRoutes"
+import { type AnalyticsRoutesDeps, registerAnalyticsRoutes } from "./routes/analyticsRoutes"
 import { type AuthRoutesDeps, registerAuthRoutes } from "./routes/authRoutes"
 import { type BillingRoutesDeps, registerBillingRoutes } from "./routes/billingRoutes"
 import { type CatalogRoutesDeps, registerCatalogRoutes } from "./routes/catalogRoutes"
@@ -19,6 +20,7 @@ import {
   type SubscriptionRoutesDeps,
   registerSubscriptionRoutes,
 } from "./routes/subscriptionRoutes"
+import { type VideoRoutesDeps, registerVideoRoutes } from "./routes/videoRoutes"
 import "./types"
 
 export interface ServerDeps {
@@ -31,6 +33,8 @@ export interface ServerDeps {
   channels: ChannelRoutesDeps
   socialAccounts: SocialAccountRoutesDeps
   notifications: NotificationRoutesDeps
+  videos: VideoRoutesDeps
+  analytics: AnalyticsRoutesDeps
 }
 
 /**
@@ -52,6 +56,8 @@ export function buildServer(deps: ServerDeps): FastifyInstance {
   registerChannelRoutes(app, deps.channels)
   registerSocialAccountRoutes(app, deps.socialAccounts)
   registerNotificationRoutes(app, deps.notifications)
+  registerVideoRoutes(app, deps.videos)
+  registerAnalyticsRoutes(app, deps.analytics)
 
   return app
 }

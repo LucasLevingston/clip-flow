@@ -1,6 +1,7 @@
 import { ChangeChannelStatusUseCase } from "../application/use-cases/channel-management/ChangeChannelStatusUseCase"
 import { CreateChannelUseCase } from "../application/use-cases/channel-management/CreateChannelUseCase"
 import { DeleteChannelUseCase } from "../application/use-cases/channel-management/DeleteChannelUseCase"
+import { GetChannelInsightsUseCase } from "../application/use-cases/channel-management/GetChannelInsightsUseCase"
 import { GetChannelUseCase } from "../application/use-cases/channel-management/GetChannelUseCase"
 import { ListChannelsUseCase } from "../application/use-cases/channel-management/ListChannelsUseCase"
 import { UpdateChannelConfigUseCase } from "../application/use-cases/channel-management/UpdateChannelConfigUseCase"
@@ -16,6 +17,7 @@ import type { NicheRepository } from "../domain/catalog/repositories/NicheReposi
 import type { JwtService } from "../domain/identity/services/JwtService"
 import { FakeChannelScheduleEventPublisher } from "./fakes/FakeChannelScheduleEventPublisher"
 import { FakeIdGenerator } from "./fakes/FakeIdGenerator"
+import { InMemoryChannelInsightsRepository } from "./fakes/InMemoryChannelInsightsRepository"
 import { InMemorySocialAccountRepository } from "./fakes/InMemorySocialAccountRepository"
 
 export interface BuildChannelManagementTestDepsInput {
@@ -31,11 +33,13 @@ export interface BuildChannelManagementTestDepsInput {
 export function buildChannelManagementTestDeps(input: BuildChannelManagementTestDepsInput) {
   const { channelRepository } = input
   const socialAccountRepository = new InMemorySocialAccountRepository()
+  const channelInsightsRepository = new InMemoryChannelInsightsRepository()
   const channelFactory = new ChannelFactory(new PublishSlotAllocator(), new PlanLimitsPolicy())
   const channelScheduleEventPublisher = new FakeChannelScheduleEventPublisher()
 
   return {
     socialAccountRepository,
+    channelInsightsRepository,
     channelScheduleEventPublisher,
     channelRoutesDeps: {
       createChannelUseCase: new CreateChannelUseCase({
@@ -56,6 +60,10 @@ export function buildChannelManagementTestDeps(input: BuildChannelManagementTest
         channelRepository,
         nicheRepository: input.nicheRepository,
         socialAccountRepository,
+      }),
+      getChannelInsightsUseCase: new GetChannelInsightsUseCase({
+        channelRepository,
+        channelInsightsRepository,
       }),
       updateChannelConfigUseCase: new UpdateChannelConfigUseCase({
         channelRepository,

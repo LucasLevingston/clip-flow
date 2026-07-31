@@ -9,11 +9,13 @@ import { RefreshAccessTokenUseCase } from "../application/use-cases/identity/Ref
 import { RegisterTenantUseCase } from "../application/use-cases/identity/RegisterTenantUseCase"
 import { buildServer } from "../interface/http/buildServer"
 import { buildAdminTestDeps } from "./buildAdminTestDeps"
+import { buildAnalyticsTestDeps } from "./buildAnalyticsTestDeps"
 import { buildBillingTestDeps } from "./buildBillingTestDeps"
 import { buildChannelManagementTestDeps } from "./buildChannelManagementTestDeps"
 import { buildIdentityTestContext } from "./buildIdentityTestContext"
 import { buildNotificationTestDeps } from "./buildNotificationTestDeps"
 import { buildSocialAccountTestDeps } from "./buildSocialAccountTestDeps"
+import { buildVideoTestDeps } from "./buildVideoTestDeps"
 import { FakeChannelUsageProvider } from "./fakes/FakeChannelUsageProvider"
 import { InMemoryChannelRepository } from "./fakes/InMemoryChannelRepository"
 import { InMemoryNicheRepository } from "./fakes/InMemoryNicheRepository"
@@ -46,6 +48,8 @@ export function buildTestServer() {
   })
   const admin = buildAdminTestDeps({ nicheRepository, jwtService: ctx.jwtService })
   const notifications = buildNotificationTestDeps({ jwtService: ctx.jwtService })
+  const videos = buildVideoTestDeps({ jwtService: ctx.jwtService })
+  const analytics = buildAnalyticsTestDeps({ jwtService: ctx.jwtService })
 
   const app = buildServer({
     admin: admin.adminRoutesDeps,
@@ -72,6 +76,8 @@ export function buildTestServer() {
     channels: channelManagement.channelRoutesDeps,
     socialAccounts: socialAccounts.socialAccountRoutesDeps,
     notifications: notifications.notificationRoutesDeps,
+    videos: videos.videoRoutesDeps,
+    analytics: analytics.analyticsRoutesDeps,
   })
 
   return {
@@ -83,11 +89,14 @@ export function buildTestServer() {
     checkoutSessionProvider: billing.checkoutSessionProvider,
     channelRepository,
     socialAccountRepository: channelManagement.socialAccountRepository,
+    channelInsightsRepository: channelManagement.channelInsightsRepository,
     sourceVideoRepository: admin.sourceVideoRepository,
     auditLogRepository: admin.auditLogRepository,
     generatedVideoRepository: admin.generatedVideoRepository,
     videoContentEventPublisher: admin.videoContentEventPublisher,
     notificationRepository: notifications.notificationRepository,
     notificationPreferenceRepository: notifications.notificationPreferenceRepository,
+    videoRepository: videos.videoRepository,
+    analyticsQueryRepository: analytics.analyticsQueryRepository,
   }
 }
