@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "type-check": "tsc -p tsconfig.json --noEmit",
     "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@clip-flow/shared-schemas": "workspace:^",
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "@clip-flow/eslint-config": "workspace:^",
+    "@playwright/test": "^1.62.1",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.5.2",

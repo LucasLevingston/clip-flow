@@ -16,6 +16,10 @@ const baseConfig = createJestConfig({
     },
   },
   coveragePathIgnorePatterns: ["/node_modules/", "/.next/", "layout\\.tsx$"],
+  // e2e/ holds Playwright specs (run via `playwright test`, not Jest) — same
+  // *.spec.ts naming convention, so it must be excluded explicitly or Jest
+  // tries to run them too and fails on the Playwright-only `test` import.
+  testPathIgnorePatterns: ["/node_modules/", "/.next/", "/e2e/"],
 })
 
 // next/jest hard-codes its own transformIgnorePatterns and ignores the one passed above, so
