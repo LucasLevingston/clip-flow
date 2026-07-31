@@ -59,4 +59,29 @@ export interface ChannelDetail extends ChannelDto {
   socialAccounts: SocialAccountSummary[]
 }
 
+export interface ChannelSummary {
+  id: string
+  name: string
+  nicheId: string
+  nicheName: string
+  status: "DRAFT" | "ACTIVE" | "PAUSED"
+  platforms: "SHORTS_ONLY" | "TIKTOK_ONLY" | "BOTH"
+  videosPerDay: number
+  createdAt: string
+}
+
+export interface ListChannelsResult {
+  data: ChannelSummary[]
+  meta: { page: number; pageSize: number; total: number }
+}
+
+export interface ChannelInsightsDto {
+  channelId: string
+  bestPublishHours: number[]
+  topTitlePatterns: string[]
+  topHashtags: string[]
+  avgOptimalDurationMs: number
+  computedAt: string
+}
+
 export type { CreateChannelInput, UpdateChannelConfigInput, ChangeChannelStatusInput }

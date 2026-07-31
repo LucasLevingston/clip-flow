@@ -20,6 +20,23 @@ function toChannelDto(detail: typeof channelDetailStore.state) {
 }
 
 export const channelsHandlers = [
+  http.get(`${API_BASE_URL}/v1/channels`, () =>
+    HttpResponse.json({
+      data: [
+        {
+          id: "channel-1",
+          name: "Canal Futebol",
+          nicheId: "niche-1",
+          nicheName: "Futebol",
+          status: "ACTIVE",
+          platforms: "SHORTS_ONLY",
+          videosPerDay: 1,
+          createdAt: "2026-07-01T00:00:00.000Z",
+        },
+      ],
+      meta: { page: 1, pageSize: 20, total: 1 },
+    }),
+  ),
   http.get(`${API_BASE_URL}/v1/niches`, () =>
     HttpResponse.json({
       data: [
@@ -66,4 +83,14 @@ export const channelsHandlers = [
     channelDetailStore.state = { ...channelDetailStore.state, status: body.status }
     return HttpResponse.json(toChannelDto(channelDetailStore.state))
   }),
+  http.get(`${API_BASE_URL}/v1/channels/:channelId/insights`, () =>
+    HttpResponse.json({
+      channelId: "channel-1",
+      bestPublishHours: [9, 20],
+      topTitlePatterns: ["incrivel", "gol"],
+      topHashtags: ["#futebol", "#gol"],
+      avgOptimalDurationMs: 31_000,
+      computedAt: "2026-07-30T00:00:00.000Z",
+    }),
+  ),
 ]

@@ -29,9 +29,21 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   return data as T
 }
 
+async function requestBlob(path: string): Promise<Blob> {
+  const token = authToken.get()
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    headers: { ...(token ? { authorization: `Bearer ${token}` } : {}) },
+  })
+  if (!response.ok) {
+    throw new ApiError(response.status, "EXPORT_FAILED", "Failed to download export")
+  }
+  return response.blob()
+}
+
 export const apiClient = {
   get: <T>(path: string): Promise<T> => request<T>(path),
   post: <T>(path: string, body: unknown): Promise<T> => request<T>(path, { method: "POST", body }),
   patch: <T>(path: string, body: unknown): Promise<T> =>
     request<T>(path, { method: "PATCH", body }),
+  getBlob: (path: string): Promise<Blob> => requestBlob(path),
 }
