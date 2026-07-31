@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { AnalyticsSummary } from "@/features/analytics"
-import { ChannelInsightsPanel } from "@/features/channels"
+import { ChannelInsightsPanel, UpcomingSchedulePanel } from "@/features/channels"
 import { ExportButton, VideoList } from "@/features/videos"
 
 export default async function ChannelDetailPage({
@@ -27,6 +27,7 @@ export default async function ChannelDetailPage({
         </div>
       </div>
       <AnalyticsSummary channelId={channelId} />
+      <UpcomingSchedulePanel channelId={channelId} />
       <ChannelInsightsPanel channelId={channelId} />
       <VideoList channelId={channelId} />
     </main>
