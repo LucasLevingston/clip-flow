@@ -44,3 +44,17 @@ export {
   analyticsSummaryQuerySchema,
   type AnalyticsSummaryQuery,
 } from "./analytics/analyticsSummaryQuerySchema"
+export { createNicheSchema, type CreateNicheInput } from "./admin/createNicheSchema"
+export { updateNicheSchema, type UpdateNicheInput } from "./admin/updateNicheSchema"
+export {
+  createPromptTemplateSchema,
+  type CreatePromptTemplateInput,
+} from "./admin/createPromptTemplateSchema"
+export {
+  listSourceVideosQuerySchema,
+  type ListSourceVideosQuery,
+} from "./admin/listSourceVideosQuerySchema"
+export {
+  listNichesAdminQuerySchema,
+  type ListNichesAdminQuery,
+} from "./admin/listNichesAdminQuerySchema"

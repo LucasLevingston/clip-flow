@@ -307,21 +307,23 @@ enum GeneratedVideoStatus {
 }
 
 model GeneratedVideo {
-  id                 String               @id @default(uuid())
-  tenantId           String               @map("tenant_id")
-  channelId          String               @map("channel_id")
-  sourceVideoId      String               @map("source_video_id")
-  batchRunId         String               @map("batch_run_id")
-  scheduledPublishAt DateTime             @map("scheduled_publish_at")
-  status             GeneratedVideoStatus @default(SOURCING)
-  highlight          Json?
-  copy               Json?
-  thumbnailUrl       String?              @map("thumbnail_url")
-  finalAssetUrl      String?              @map("final_asset_url")
-  failureReason      String?              @map("failure_reason")
-  flagReason         String?              @map("flag_reason")
-  createdAt          DateTime             @default(now()) @map("created_at")
-  updatedAt          DateTime             @updatedAt @map("updated_at")
+  id                             String               @id @default(uuid())
+  tenantId                       String               @map("tenant_id")
+  channelId                      String               @map("channel_id")
+  sourceVideoId                  String               @map("source_video_id")
+  batchRunId                     String               @map("batch_run_id")
+  scheduledPublishAt             DateTime             @map("scheduled_publish_at")
+  status                         GeneratedVideoStatus @default(SOURCING)
+  highlight                      Json?
+  copy                           Json?
+  thumbnailUrl                   String?              @map("thumbnail_url")
+  finalAssetUrl                  String?              @map("final_asset_url")
+  failureReason                  String?              @map("failure_reason")
+  flagReason                     String?              @map("flag_reason")
+  highlightPromptTemplateVersion Int?                 @map("highlight_prompt_template_version")
+  copyPromptTemplateVersion      Int?                 @map("copy_prompt_template_version")
+  createdAt                      DateTime             @default(now()) @map("created_at")
+  updatedAt                      DateTime             @updatedAt @map("updated_at")
 
   channel        Channel         @relation(fields: [channelId], references: [id], onDelete: Restrict)
   sourceVideo    SourceVideo     @relation(fields: [sourceVideoId], references: [id], onDelete: Restrict)
@@ -430,4 +432,16 @@ model AuditLog {
   createdAt   DateTime       @default(now()) @map("created_at")
 
   @@map("audit_log")
+}
+
+/// Written every ~1 min by the Health Worker cron cycle (docs/workers/health-worker.md);
+/// `GET /v1/admin/health` reads the latest row.
+model PlatformHealthSnapshot {
+  id           String   @id @default(uuid())
+  queues       Json
+  integrations Json
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt(sort: Desc)])
+  @@map("platform_health_snapshot")
 }
