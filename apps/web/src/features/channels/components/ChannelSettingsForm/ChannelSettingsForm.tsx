@@ -3,6 +3,7 @@
 import { useChannel } from "../../hooks/useChannel"
 import { useChangeChannelStatus } from "../../hooks/useChangeChannelStatus"
 import { useUpdateChannelConfig } from "../../hooks/useUpdateChannelConfig"
+import { SocialAccountsPanel } from "../SocialAccountsPanel"
 import { ConfigForm } from "./ConfigForm"
 import { StatusControl } from "./StatusControl"
 
@@ -33,6 +34,8 @@ export function ChannelSettingsForm({ channelId }: { channelId: string }) {
 
       {updateConfig.isSuccess && <p>Configuração salva!</p>}
       {updateConfig.isError && <p role="alert">Não foi possível salvar a configuração.</p>}
+
+      <SocialAccountsPanel channel={channel} />
     </div>
   )
 }

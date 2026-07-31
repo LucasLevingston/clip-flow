@@ -1,5 +1,6 @@
 import { http, HttpResponse } from "msw"
 import { channelDetailStore } from "./channelDetailStore"
+import { socialAccountsHandlers } from "./socialAccountsHandlers"
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3333"
 
@@ -93,4 +94,5 @@ export const channelsHandlers = [
       computedAt: "2026-07-30T00:00:00.000Z",
     }),
   ),
+  ...socialAccountsHandlers,
 ]
