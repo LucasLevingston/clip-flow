@@ -1,4 +1,5 @@
 import { http, HttpResponse } from "msw"
+import { contentSourceConfigHandlers } from "./contentSourceConfigHandlers"
 import { nichesStore } from "./nichesStore"
 import { sourceVideoHandlers } from "./sourceVideoHandlers"
 import type { NicheStatus } from "../types"
@@ -63,4 +64,5 @@ export const adminNichesHandlers = [
     },
   ),
   ...sourceVideoHandlers,
+  ...contentSourceConfigHandlers,
 ]

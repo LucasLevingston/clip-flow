@@ -33,4 +33,11 @@ export class InMemorySourceVideoRepository implements SourceVideoRepository {
     this.sourceVideosById.set(sourceVideo.id, sourceVideo)
     return Promise.resolve()
   }
+
+  existsByExternalRef(nicheId: string, externalRef: string): Promise<boolean> {
+    const exists = [...this.sourceVideosById.values()].some(
+      (sourceVideo) => sourceVideo.nicheId === nicheId && sourceVideo.externalRef === externalRef,
+    )
+    return Promise.resolve(exists)
+  }
 }

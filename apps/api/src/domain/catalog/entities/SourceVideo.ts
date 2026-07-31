@@ -9,6 +9,7 @@ export interface SourceVideoProps {
   license: LicenseInfo
   status: SourceVideoStatus
   storageUrl: string
+  externalRef: string | null
   createdAt: Date
 }
 
@@ -17,14 +18,16 @@ export class SourceVideo {
   private constructor(private readonly props: SourceVideoProps) {}
 
   static create(
-    props: Omit<SourceVideoProps, "status" | "createdAt"> & {
+    props: Omit<SourceVideoProps, "status" | "createdAt" | "externalRef"> & {
       status?: SourceVideoStatus
       createdAt?: Date
+      externalRef?: string | null
     },
   ): SourceVideo {
     return new SourceVideo({
       ...props,
       status: props.status ?? "PENDING_REVIEW",
+      externalRef: props.externalRef ?? null,
       createdAt: props.createdAt ?? new Date(),
     })
   }
@@ -51,6 +54,10 @@ export class SourceVideo {
 
   get storageUrl(): string {
     return this.props.storageUrl
+  }
+
+  get externalRef(): string | null {
+    return this.props.externalRef
   }
 
   get createdAt(): Date {

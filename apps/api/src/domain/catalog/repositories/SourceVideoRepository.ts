@@ -17,4 +17,5 @@ export interface SourceVideoRepository {
   findById(id: string): Promise<SourceVideo | null>
   findPaginated(filter: SourceVideoListFilter): Promise<SourceVideoListResult>
   save(sourceVideo: SourceVideo): Promise<void>
+  existsByExternalRef(nicheId: string, externalRef: string): Promise<boolean>
 }

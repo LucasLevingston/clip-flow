@@ -15,6 +15,7 @@ function toDomain(record: PrismaSourceVideo): SourceVideo {
     license: LicenseInfo.create(record.licenseType, record.licenseReference),
     status: record.status,
     storageUrl: record.storageUrl,
+    externalRef: record.externalRef,
     createdAt: record.createdAt,
   })
 }
@@ -50,6 +51,7 @@ export class SourceVideoPrismaRepository implements SourceVideoRepository {
       licenseReference: sourceVideo.license.licenseReference,
       status: sourceVideo.status,
       storageUrl: sourceVideo.storageUrl,
+      externalRef: sourceVideo.externalRef,
     }
 
     await prisma.sourceVideo.upsert({
@@ -57,5 +59,13 @@ export class SourceVideoPrismaRepository implements SourceVideoRepository {
       create: { id: sourceVideo.id, ...data },
       update: data,
     })
+  }
+
+  async existsByExternalRef(nicheId: string, externalRef: string): Promise<boolean> {
+    const record = await prisma.sourceVideo.findFirst({
+      where: { nicheId, externalRef },
+      select: { id: true },
+    })
+    return record !== null
   }
 }

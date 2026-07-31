@@ -58,3 +58,7 @@ export {
   listNichesAdminQuerySchema,
   type ListNichesAdminQuery,
 } from "./admin/listNichesAdminQuerySchema"
+export {
+  createContentSourceConfigSchema,
+  type CreateContentSourceConfigInput,
+} from "./admin/createContentSourceConfigSchema"

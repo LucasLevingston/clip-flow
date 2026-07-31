@@ -11,6 +11,7 @@ import { ListNichesAdminUseCase } from "../../application/use-cases/catalog/List
 import type { NicheRepository } from "../../domain/catalog/repositories/NicheRepository"
 import type { JwtService } from "../../domain/identity/services/JwtService"
 import { UuidGenerator } from "../auth/UuidGenerator"
+import { createContentSourceDiscoveryDeps } from "./createContentSourceDiscoveryDeps"
 import { BullMqVideoContentEventPublisher } from "../queue/BullMqVideoContentEventPublisher"
 import { AuditLogPrismaRepository } from "../repositories/AuditLogPrismaRepository"
 import { GeneratedVideoPrismaRepository } from "../repositories/GeneratedVideoPrismaRepository"
@@ -30,6 +31,11 @@ export function createAdminDeps(input: CreateAdminDepsInput) {
   const generatedVideoRepository = new GeneratedVideoPrismaRepository()
   const promptTemplateRepository = new PromptTemplatePrismaRepository()
   const platformHealthSnapshotRepository = new PlatformHealthSnapshotPrismaRepository()
+  const contentSourceDiscovery = createContentSourceDiscoveryDeps({
+    nicheRepository: input.nicheRepository,
+    sourceVideoRepository,
+    auditLogRepository,
+  })
 
   return {
     createNicheUseCase: new CreateNicheUseCase({
@@ -61,6 +67,9 @@ export function createAdminDeps(input: CreateAdminDepsInput) {
       auditLogRepository,
       idGenerator: new UuidGenerator(),
     }),
+    createContentSourceConfigUseCase: contentSourceDiscovery.createContentSourceConfigUseCase,
+    listContentSourceConfigsUseCase: contentSourceDiscovery.listContentSourceConfigsUseCase,
+    discoverContentUseCase: contentSourceDiscovery.discoverContentUseCase,
     listModerationQueueUseCase: new ListModerationQueueUseCase({ generatedVideoRepository }),
     reviewFlaggedVideoUseCase: new ReviewFlaggedVideoUseCase({
       generatedVideoRepository,

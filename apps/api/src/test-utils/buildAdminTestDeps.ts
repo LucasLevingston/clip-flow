@@ -10,6 +10,7 @@ import { GetPlatformHealthUseCase } from "../application/use-cases/health/GetPla
 import { ListNichesAdminUseCase } from "../application/use-cases/catalog/ListNichesAdminUseCase"
 import type { NicheRepository } from "../domain/catalog/repositories/NicheRepository"
 import type { JwtService } from "../domain/identity/services/JwtService"
+import { buildContentSourceTestDeps } from "./buildContentSourceTestDeps"
 import { FakeIdGenerator } from "./fakes/FakeIdGenerator"
 import { FakePromptTemplateRepository } from "./fakes/FakePromptTemplateRepository"
 import { FakeVideoContentEventPublisher } from "./fakes/FakeVideoContentEventPublisher"
@@ -31,6 +32,11 @@ export function buildAdminTestDeps(input: BuildAdminTestDepsInput) {
   const promptTemplateRepository = new FakePromptTemplateRepository()
   const platformHealthSnapshotRepository = new InMemoryPlatformHealthSnapshotRepository()
   const videoContentEventPublisher = new FakeVideoContentEventPublisher()
+  const contentSource = buildContentSourceTestDeps({
+    nicheRepository: input.nicheRepository,
+    sourceVideoRepository,
+    auditLogRepository,
+  })
 
   return {
     sourceVideoRepository,
@@ -39,6 +45,10 @@ export function buildAdminTestDeps(input: BuildAdminTestDepsInput) {
     promptTemplateRepository,
     platformHealthSnapshotRepository,
     videoContentEventPublisher,
+    contentSourceConfigRepository: contentSource.contentSourceConfigRepository,
+    rssProvider: contentSource.rssProvider,
+    localFolderProvider: contentSource.localFolderProvider,
+    partnerApiProvider: contentSource.partnerApiProvider,
     adminRoutesDeps: {
       createNicheUseCase: new CreateNicheUseCase({
         nicheRepository: input.nicheRepository,
@@ -71,6 +81,9 @@ export function buildAdminTestDeps(input: BuildAdminTestDepsInput) {
         auditLogRepository,
         idGenerator: new FakeIdGenerator(),
       }),
+      createContentSourceConfigUseCase: contentSource.createContentSourceConfigUseCase,
+      listContentSourceConfigsUseCase: contentSource.listContentSourceConfigsUseCase,
+      discoverContentUseCase: contentSource.discoverContentUseCase,
       listModerationQueueUseCase: new ListModerationQueueUseCase({ generatedVideoRepository }),
       reviewFlaggedVideoUseCase: new ReviewFlaggedVideoUseCase({
         generatedVideoRepository,

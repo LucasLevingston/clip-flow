@@ -76,3 +76,35 @@ export interface ReviewSourceVideoInput {
   decision: "APPROVED" | "REJECTED"
   reason?: string
 }
+
+export type ContentSourceProviderType = "RSS_FEED" | "LOCAL_FOLDER" | "PARTNER_API"
+
+export type ContentSourceSettings =
+  { feedUrl: string } | { folderPath: string; baseUrl: string } | { apiUrl: string; apiKey: string }
+
+export interface ContentSourceConfigAdmin {
+  id: string
+  nicheId: string
+  providerType: ContentSourceProviderType
+  name: string
+  settings: ContentSourceSettings
+  licenseType: LicenseType
+  licenseReference: string
+  isActive: boolean
+  createdAt: string
+}
+
+export interface CreateContentSourceConfigInput {
+  providerType: ContentSourceProviderType
+  name: string
+  settings: ContentSourceSettings
+  licenseType: LicenseType
+  licenseReference: string
+}
+
+export interface DiscoverContentResult {
+  discovered: number
+  ingested: number
+  skipped: number
+  failedSources: Array<{ contentSourceConfigId: string; name: string; message: string }>
+}

@@ -1,4 +1,9 @@
-import { NicheManager, PromptTemplateForm, SourceVideoCuration } from "@/features/admin-niches"
+import {
+  ContentSourceManager,
+  NicheManager,
+  PromptTemplateForm,
+  SourceVideoCuration,
+} from "@/features/admin-niches"
 
 export default function AdminNichesPage() {
   return (
@@ -8,6 +13,7 @@ export default function AdminNichesPage() {
       </h1>
       <NicheManager />
       <PromptTemplateForm />
+      <ContentSourceManager />
       <SourceVideoCuration />
     </main>
   )

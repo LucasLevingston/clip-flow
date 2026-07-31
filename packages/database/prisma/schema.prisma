@@ -155,9 +155,10 @@ model Niche {
   activePromptTemplateId String?     @map("active_prompt_template_id")
   createdAt              DateTime    @default(now()) @map("created_at")
 
-  sourceVideos    SourceVideo[]
-  promptTemplates PromptTemplate[]
-  channels        Channel[]
+  sourceVideos         SourceVideo[]
+  promptTemplates      PromptTemplate[]
+  channels             Channel[]
+  contentSourceConfigs ContentSourceConfig[]
 
   @@map("niche")
 }
@@ -183,14 +184,40 @@ model SourceVideo {
   licenseReference String            @map("license_reference")
   status           SourceVideoStatus @default(PENDING_REVIEW)
   storageUrl       String            @map("storage_url")
+  externalRef      String?           @map("external_ref")
   createdAt        DateTime          @default(now()) @map("created_at")
 
   niche           Niche            @relation(fields: [nicheId], references: [id], onDelete: Restrict)
   transcript      Transcript?
   generatedVideos GeneratedVideo[]
 
+  @@unique([nicheId, externalRef])
   @@index([nicheId, status])
   @@map("source_video")
+}
+
+/** ADR-0006 — Strategy Pattern: each provider type discovers candidates from a pre-vetted, licensed source. */
+enum ContentSourceProviderType {
+  RSS_FEED
+  LOCAL_FOLDER
+  PARTNER_API
+}
+
+/** Admin-configured, pre-licensed discovery source (ADR-0006 alternative 2 extended). Never auto-approves output — discovered candidates still land as SourceVideo(PENDING_REVIEW). */
+model ContentSourceConfig {
+  id               String                    @id @default(uuid())
+  nicheId          String                    @map("niche_id")
+  providerType     ContentSourceProviderType @map("provider_type")
+  name             String
+  config           Json
+  licenseType      LicenseType               @map("license_type")
+  licenseReference String                    @map("license_reference")
+  isActive         Boolean                   @default(true) @map("is_active")
+  createdAt        DateTime                  @default(now()) @map("created_at")
+
+  niche Niche @relation(fields: [nicheId], references: [id], onDelete: Restrict)
+
+  @@map("content_source_config")
 }
 
 enum PromptTemplateType {
