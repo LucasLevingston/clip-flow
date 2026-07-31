@@ -5,6 +5,7 @@ import { useChangeChannelStatus } from "../../hooks/useChangeChannelStatus"
 import { useUpdateChannelConfig } from "../../hooks/useUpdateChannelConfig"
 import { SocialAccountsPanel } from "../SocialAccountsPanel"
 import { ConfigForm } from "./ConfigForm"
+import { RunNowButton } from "./RunNowButton"
 import { StatusControl } from "./StatusControl"
 
 export function ChannelSettingsForm({ channelId }: { channelId: string }) {
@@ -25,6 +26,8 @@ export function ChannelSettingsForm({ channelId }: { channelId: string }) {
           changeStatus.mutate({ status: channel.status === "ACTIVE" ? "PAUSED" : "ACTIVE" })
         }
       />
+
+      {channel.status === "ACTIVE" && <RunNowButton channelId={channel.id} />}
 
       <ConfigForm
         channel={channel}

@@ -5,6 +5,7 @@ import type { DeleteChannelUseCase } from "../../../application/use-cases/channe
 import type { GetChannelInsightsUseCase } from "../../../application/use-cases/channel-management/GetChannelInsightsUseCase"
 import type { GetChannelUseCase } from "../../../application/use-cases/channel-management/GetChannelUseCase"
 import type { ListChannelsUseCase } from "../../../application/use-cases/channel-management/ListChannelsUseCase"
+import type { TriggerChannelGenerationUseCase } from "../../../application/use-cases/channel-management/TriggerChannelGenerationUseCase"
 import type { UpdateChannelConfigUseCase } from "../../../application/use-cases/channel-management/UpdateChannelConfigUseCase"
 import type { JwtService } from "../../../domain/identity/services/JwtService"
 import { createAuthMiddleware } from "../middlewares/authMiddleware"
@@ -15,6 +16,7 @@ import { createDeleteChannelHandler } from "./channels/deleteChannelHandler"
 import { createGetChannelHandler } from "./channels/getChannelHandler"
 import { createGetChannelInsightsHandler } from "./channels/getChannelInsightsHandler"
 import { createListChannelsHandler } from "./channels/listChannelsHandler"
+import { createTriggerChannelGenerationHandler } from "./channels/triggerChannelGenerationHandler"
 import { createUpdateChannelConfigHandler } from "./channels/updateChannelConfigHandler"
 
 export interface ChannelRoutesDeps {
@@ -25,6 +27,7 @@ export interface ChannelRoutesDeps {
   updateChannelConfigUseCase: UpdateChannelConfigUseCase
   changeChannelStatusUseCase: ChangeChannelStatusUseCase
   deleteChannelUseCase: DeleteChannelUseCase
+  triggerChannelGenerationUseCase: TriggerChannelGenerationUseCase
   jwtService: JwtService
 }
 
@@ -75,5 +78,11 @@ export function registerChannelRoutes(app: FastifyInstance, deps: ChannelRoutesD
     "/v1/channels/:channelId",
     { preHandler: [authMiddleware, requireOwner] },
     createDeleteChannelHandler(deps.deleteChannelUseCase),
+  )
+
+  app.post<ChannelIdParams>(
+    "/v1/channels/:channelId/generate-now",
+    { preHandler: [authMiddleware, requireOwnerOrAdmin] },
+    createTriggerChannelGenerationHandler(deps.triggerChannelGenerationUseCase),
   )
 }

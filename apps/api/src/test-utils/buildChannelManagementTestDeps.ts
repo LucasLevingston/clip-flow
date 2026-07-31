@@ -4,6 +4,7 @@ import { DeleteChannelUseCase } from "../application/use-cases/channel-managemen
 import { GetChannelInsightsUseCase } from "../application/use-cases/channel-management/GetChannelInsightsUseCase"
 import { GetChannelUseCase } from "../application/use-cases/channel-management/GetChannelUseCase"
 import { ListChannelsUseCase } from "../application/use-cases/channel-management/ListChannelsUseCase"
+import { TriggerChannelGenerationUseCase } from "../application/use-cases/channel-management/TriggerChannelGenerationUseCase"
 import { UpdateChannelConfigUseCase } from "../application/use-cases/channel-management/UpdateChannelConfigUseCase"
 import type { ChannelUsageProvider } from "../domain/billing/repositories/ChannelUsageProvider"
 import type { PlanRepository } from "../domain/billing/repositories/PlanRepository"
@@ -16,6 +17,7 @@ import { PublishSlotAllocator } from "../domain/channel-management/services/Publ
 import type { NicheRepository } from "../domain/catalog/repositories/NicheRepository"
 import type { JwtService } from "../domain/identity/services/JwtService"
 import { FakeChannelScheduleEventPublisher } from "./fakes/FakeChannelScheduleEventPublisher"
+import { FakeGenerationTriggerPublisher } from "./fakes/FakeGenerationTriggerPublisher"
 import { FakeIdGenerator } from "./fakes/FakeIdGenerator"
 import { InMemoryChannelInsightsRepository } from "./fakes/InMemoryChannelInsightsRepository"
 import { InMemorySocialAccountRepository } from "./fakes/InMemorySocialAccountRepository"
@@ -36,11 +38,13 @@ export function buildChannelManagementTestDeps(input: BuildChannelManagementTest
   const channelInsightsRepository = new InMemoryChannelInsightsRepository()
   const channelFactory = new ChannelFactory(new PublishSlotAllocator(), new PlanLimitsPolicy())
   const channelScheduleEventPublisher = new FakeChannelScheduleEventPublisher()
+  const generationTriggerPublisher = new FakeGenerationTriggerPublisher()
 
   return {
     socialAccountRepository,
     channelInsightsRepository,
     channelScheduleEventPublisher,
+    generationTriggerPublisher,
     channelRoutesDeps: {
       createChannelUseCase: new CreateChannelUseCase({
         nicheRepository: input.nicheRepository,
@@ -81,6 +85,10 @@ export function buildChannelManagementTestDeps(input: BuildChannelManagementTest
       deleteChannelUseCase: new DeleteChannelUseCase({
         channelRepository,
         channelScheduleEventPublisher,
+      }),
+      triggerChannelGenerationUseCase: new TriggerChannelGenerationUseCase({
+        channelRepository,
+        generationTriggerPublisher,
       }),
       jwtService: input.jwtService,
     },

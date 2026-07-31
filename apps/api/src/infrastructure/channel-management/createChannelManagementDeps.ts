@@ -4,6 +4,7 @@ import { DeleteChannelUseCase } from "../../application/use-cases/channel-manage
 import { GetChannelInsightsUseCase } from "../../application/use-cases/channel-management/GetChannelInsightsUseCase"
 import { GetChannelUseCase } from "../../application/use-cases/channel-management/GetChannelUseCase"
 import { ListChannelsUseCase } from "../../application/use-cases/channel-management/ListChannelsUseCase"
+import { TriggerChannelGenerationUseCase } from "../../application/use-cases/channel-management/TriggerChannelGenerationUseCase"
 import { UpdateChannelConfigUseCase } from "../../application/use-cases/channel-management/UpdateChannelConfigUseCase"
 import type { ChannelUsageProvider } from "../../domain/billing/repositories/ChannelUsageProvider"
 import type { PlanRepository } from "../../domain/billing/repositories/PlanRepository"
@@ -16,6 +17,7 @@ import type { NicheRepository } from "../../domain/catalog/repositories/NicheRep
 import type { JwtService } from "../../domain/identity/services/JwtService"
 import { UuidGenerator } from "../auth/UuidGenerator"
 import { BullMqChannelScheduleEventPublisher } from "../queue/BullMqChannelScheduleEventPublisher"
+import { BullMqGenerationTriggerPublisher } from "../queue/BullMqGenerationTriggerPublisher"
 import { ChannelInsightsPrismaRepository } from "../repositories/ChannelInsightsPrismaRepository"
 import { ChannelPrismaRepository } from "../repositories/ChannelPrismaRepository"
 import { SocialAccountPrismaRepository } from "../repositories/SocialAccountPrismaRepository"
@@ -75,6 +77,10 @@ export function createChannelManagementDeps(input: CreateChannelManagementDepsIn
     deleteChannelUseCase: new DeleteChannelUseCase({
       channelRepository,
       channelScheduleEventPublisher,
+    }),
+    triggerChannelGenerationUseCase: new TriggerChannelGenerationUseCase({
+      channelRepository,
+      generationTriggerPublisher: new BullMqGenerationTriggerPublisher(),
     }),
     jwtService: input.jwtService,
   }

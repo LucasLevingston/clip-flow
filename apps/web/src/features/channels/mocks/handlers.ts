@@ -94,5 +94,9 @@ export const channelsHandlers = [
       computedAt: "2026-07-30T00:00:00.000Z",
     }),
   ),
+  http.post(
+    `${API_BASE_URL}/v1/channels/:channelId/generate-now`,
+    () => new HttpResponse(null, { status: 202 }),
+  ),
   ...socialAccountsHandlers,
 ]

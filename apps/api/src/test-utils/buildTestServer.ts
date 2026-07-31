@@ -90,6 +90,7 @@ export function buildTestServer() {
     channelRepository,
     socialAccountRepository: channelManagement.socialAccountRepository,
     channelInsightsRepository: channelManagement.channelInsightsRepository,
+    generationTriggerPublisher: channelManagement.generationTriggerPublisher,
     sourceVideoRepository: admin.sourceVideoRepository,
     promptTemplateRepository: admin.promptTemplateRepository,
     platformHealthSnapshotRepository: admin.platformHealthSnapshotRepository,

@@ -28,7 +28,8 @@ function rawFetch(path: string, options: RequestOptions): Promise<Response> {
 }
 
 async function parseResponse<T>(response: Response): Promise<T> {
-  const data: unknown = response.status === 204 ? null : await response.json()
+  const text = await response.text()
+  const data: unknown = text ? JSON.parse(text) : null
   if (!response.ok) {
     const envelope = data as { error: { code: string; message: string } }
     throw new ApiError(response.status, envelope.error.code, envelope.error.message)

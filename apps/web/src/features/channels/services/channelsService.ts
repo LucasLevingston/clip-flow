@@ -25,4 +25,6 @@ export const channelsService = {
     apiClient.patch<ChannelDto>(`/v1/channels/${channelId}`, input),
   changeChannelStatus: (channelId: string, input: ChangeChannelStatusInput): Promise<ChannelDto> =>
     apiClient.patch<ChannelDto>(`/v1/channels/${channelId}/status`, input),
+  triggerGeneration: (channelId: string): Promise<void> =>
+    apiClient.post<void>(`/v1/channels/${channelId}/generate-now`, undefined),
 }

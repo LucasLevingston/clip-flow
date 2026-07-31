@@ -20,6 +20,7 @@ const MAPPING: Record<string, HttpErrorMapping> = {
   ChannelNotFoundError: { statusCode: 404, code: "CHANNEL_NOT_FOUND" },
   NicheImmutableError: { statusCode: 422, code: "NICHE_IMMUTABLE" },
   ChannelNotReadyError: { statusCode: 422, code: "CHANNEL_NOT_READY" },
+  ChannelNotActiveError: { statusCode: 409, code: "CHANNEL_NOT_ACTIVE" },
   SocialAccountAlreadyConnectedError: { statusCode: 409, code: "SOCIAL_ACCOUNT_ALREADY_CONNECTED" },
   InvalidOAuthStateError: { statusCode: 400, code: "INVALID_OAUTH_STATE" },
   OAuthExchangeFailedError: { statusCode: 502, code: "OAUTH_EXCHANGE_FAILED" },
