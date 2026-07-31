@@ -23,11 +23,11 @@
     "@clip-flow/eslint-config": "workspace:^",
     "@clip-flow/jest-preset": "workspace:^",
     "@types/jest": "^30.0.0",
-    "@types/node": "^20.0.0",
+    "@types/node": "^26.1.2",
     "jest": "^30.4.2",
     "ts-jest": "^29.4.12",
     "tsup": "^8.5.1",
     "tsx": "^4.23.1",
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   }
 }
