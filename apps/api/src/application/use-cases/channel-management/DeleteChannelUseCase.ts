@@ -17,12 +17,12 @@ export class DeleteChannelUseCase {
   constructor(private readonly deps: DeleteChannelUseCaseDeps) {}
 
   async execute(input: DeleteChannelInput): Promise<void> {
-    const channel = await this.deps.channelRepository.findById(input.channelId)
-    if (!channel || channel.tenantId !== input.tenantId) {
+    const channel = await this.deps.channelRepository.findById(input.channelId, input.tenantId)
+    if (!channel) {
       throw new ChannelNotFoundError(input.channelId)
     }
 
-    await this.deps.channelRepository.delete(channel.id)
+    await this.deps.channelRepository.delete(channel.id, channel.tenantId)
     await this.deps.channelScheduleEventPublisher.removeChannel(channel.id, channel.tenantId)
   }
 }

@@ -16,7 +16,7 @@ import { InMemoryChannelRepository } from "../../../test-utils/fakes/InMemoryCha
 import { InMemorySocialAccountRepository } from "../../../test-utils/fakes/InMemorySocialAccountRepository"
 import { ConnectSocialAccountUseCase } from "./ConnectSocialAccountUseCase"
 
-const stateSigner = new HmacOAuthStateSigner("test-secret")
+const stateSigner = new HmacOAuthStateSigner("test-secret-1234567890")
 
 async function buildScenario(platforms: "SHORTS_ONLY" | "BOTH" = "SHORTS_ONLY") {
   const channelRepository = new InMemoryChannelRepository()
@@ -70,7 +70,7 @@ describe("ConnectSocialAccountUseCase", () => {
     })
 
     expect(result.status).toBe("CONNECTED")
-    const channel = await channelRepository.findById("channel-1")
+    const channel = await channelRepository.findById("channel-1", "tenant-1")
     expect(channel?.status).toBe("ACTIVE")
     expect(channelScheduleEventPublisher.registered).toEqual([
       expect.objectContaining({ channelId: "channel-1" }),
@@ -89,7 +89,7 @@ describe("ConnectSocialAccountUseCase", () => {
       state: validState(),
     })
 
-    const channel = await channelRepository.findById("channel-1")
+    const channel = await channelRepository.findById("channel-1", "tenant-1")
     expect(channel?.status).toBe("DRAFT")
     expect(channelScheduleEventPublisher.registered).toEqual([])
     expect(channelScheduleEventPublisher.removed).toEqual([])

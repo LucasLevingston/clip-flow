@@ -23,6 +23,13 @@ export class SocialAccountPrismaRepository implements SocialAccountRepository {
     return record ? toDomain(record) : null
   }
 
+  async findByIdAndChannel(id: string, channelId: string): Promise<SocialAccount | null> {
+    const record = await prisma.socialAccount.findFirst({
+      where: { id, channelId, deletedAt: null },
+    })
+    return record ? toDomain(record) : null
+  }
+
   async findByChannelAndPlatform(
     channelId: string,
     platform: SocialAccountPlatform,
@@ -56,7 +63,10 @@ export class SocialAccountPrismaRepository implements SocialAccountRepository {
     })
   }
 
-  async delete(id: string): Promise<void> {
-    await prisma.socialAccount.update({ where: { id }, data: { deletedAt: new Date() } })
+  async delete(id: string, channelId: string): Promise<void> {
+    await prisma.socialAccount.updateMany({
+      where: { id, channelId },
+      data: { deletedAt: new Date() },
+    })
   }
 }

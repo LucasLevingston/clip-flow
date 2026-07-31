@@ -4,9 +4,15 @@ import type {
   OAuthStateSigner,
 } from "../../domain/channel-management/services/OAuthStateSigner"
 
+const MIN_SECRET_LENGTH = 16
+
 /** Self-contained anti-CSRF token — signed, not encrypted (payload has no secret data). */
 export class HmacOAuthStateSigner implements OAuthStateSigner {
-  constructor(private readonly secret: string) {}
+  constructor(private readonly secret: string) {
+    if (secret.length < MIN_SECRET_LENGTH) {
+      throw new Error(`OAUTH_STATE_SECRET must be at least ${MIN_SECRET_LENGTH} characters`)
+    }
+  }
 
   sign(payload: OAuthStatePayload): string {
     const encoded = Buffer.from(JSON.stringify(payload), "utf8").toString("base64url")

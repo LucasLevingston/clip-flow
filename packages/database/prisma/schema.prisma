@@ -331,6 +331,7 @@ model GeneratedVideo {
 
   @@unique([channelId, batchRunId, scheduledPublishAt])
   @@index([tenantId, createdAt(sort: Desc)])
+  @@index([tenantId, status, createdAt(sort: Desc)])
   @@index([channelId, createdAt(sort: Desc)])
   @@index([channelId, sourceVideoId])
   @@map("generated_video")

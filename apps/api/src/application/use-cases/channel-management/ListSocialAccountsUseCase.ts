@@ -29,8 +29,8 @@ export class ListSocialAccountsUseCase {
   constructor(private readonly deps: ListSocialAccountsUseCaseDeps) {}
 
   async execute(input: ListSocialAccountsInput): Promise<SocialAccountListItem[]> {
-    const channel = await this.deps.channelRepository.findById(input.channelId)
-    if (!channel || channel.tenantId !== input.tenantId) {
+    const channel = await this.deps.channelRepository.findById(input.channelId, input.tenantId)
+    if (!channel) {
       throw new ChannelNotFoundError(input.channelId)
     }
 

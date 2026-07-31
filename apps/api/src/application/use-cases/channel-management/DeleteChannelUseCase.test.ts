@@ -28,7 +28,7 @@ describe("DeleteChannelUseCase", () => {
 
     await useCase.execute({ tenantId: "tenant-1", channelId: "channel-1" })
 
-    expect(await channelRepository.findById("channel-1")).toBeNull()
+    expect(await channelRepository.findById("channel-1", "tenant-1")).toBeNull()
     expect(channelScheduleEventPublisher.removed).toEqual([
       expect.objectContaining({ channelId: "channel-1" }),
     ])

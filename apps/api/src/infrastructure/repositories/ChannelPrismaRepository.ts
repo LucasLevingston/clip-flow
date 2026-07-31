@@ -26,8 +26,8 @@ function toDomain(record: PrismaChannel): Channel {
 }
 
 export class ChannelPrismaRepository implements ChannelRepository {
-  async findById(id: string): Promise<Channel | null> {
-    const record = await prisma.channel.findFirst({ where: { id, deletedAt: null } })
+  async findById(id: string, tenantId: string): Promise<Channel | null> {
+    const record = await prisma.channel.findFirst({ where: { id, tenantId, deletedAt: null } })
     return record ? toDomain(record) : null
   }
 
@@ -73,7 +73,7 @@ export class ChannelPrismaRepository implements ChannelRepository {
     })
   }
 
-  async delete(id: string): Promise<void> {
-    await prisma.channel.update({ where: { id }, data: { deletedAt: new Date() } })
+  async delete(id: string, tenantId: string): Promise<void> {
+    await prisma.channel.updateMany({ where: { id, tenantId }, data: { deletedAt: new Date() } })
   }
 }

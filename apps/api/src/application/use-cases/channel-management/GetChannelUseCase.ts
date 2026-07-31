@@ -37,8 +37,8 @@ export class GetChannelUseCase {
   constructor(private readonly deps: GetChannelUseCaseDeps) {}
 
   async execute(input: GetChannelInput): Promise<GetChannelOutput> {
-    const channel = await this.deps.channelRepository.findById(input.channelId)
-    if (!channel || channel.tenantId !== input.tenantId) {
+    const channel = await this.deps.channelRepository.findById(input.channelId, input.tenantId)
+    if (!channel) {
       throw new ChannelNotFoundError(input.channelId)
     }
 

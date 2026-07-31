@@ -28,8 +28,8 @@ export class GetSocialAccountOAuthUrlUseCase {
   constructor(private readonly deps: GetSocialAccountOAuthUrlUseCaseDeps) {}
 
   async execute(input: GetSocialAccountOAuthUrlInput): Promise<GetSocialAccountOAuthUrlOutput> {
-    const channel = await this.deps.channelRepository.findById(input.channelId)
-    if (!channel || channel.tenantId !== input.tenantId) {
+    const channel = await this.deps.channelRepository.findById(input.channelId, input.tenantId)
+    if (!channel) {
       throw new ChannelNotFoundError(input.channelId)
     }
 

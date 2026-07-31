@@ -15,7 +15,7 @@ import { InMemoryChannelRepository } from "../../../test-utils/fakes/InMemoryCha
 import { InMemorySocialAccountRepository } from "../../../test-utils/fakes/InMemorySocialAccountRepository"
 import { ReauthSocialAccountUseCase } from "./ReauthSocialAccountUseCase"
 
-const stateSigner = new HmacOAuthStateSigner("test-secret")
+const stateSigner = new HmacOAuthStateSigner("test-secret-1234567890")
 
 async function buildScenario(channelStatus: "ACTIVE" | "DRAFT" = "ACTIVE") {
   const channelRepository = new InMemoryChannelRepository()
@@ -94,7 +94,7 @@ describe("ReauthSocialAccountUseCase", () => {
       state: validState(),
     })
 
-    const channel = await channelRepository.findById("channel-1")
+    const channel = await channelRepository.findById("channel-1", "tenant-1")
     expect(channel?.status).toBe("ACTIVE")
     expect(channelScheduleEventPublisher.registered).toEqual([
       expect.objectContaining({ channelId: "channel-1" }),

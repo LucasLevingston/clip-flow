@@ -13,10 +13,13 @@ import { createChannelManagementDeps } from "./infrastructure/channel-management
 import { createSocialAccountDeps } from "./infrastructure/channel-management/createSocialAccountDeps"
 import { createAdminDeps } from "./infrastructure/catalog/createAdminDeps"
 import { createIdentityDeps } from "./infrastructure/identity/createIdentityDeps"
+import { validateRequiredEnv } from "./infrastructure/env/validateRequiredEnv"
 import { createNotificationDeps } from "./infrastructure/notifications/createNotificationDeps"
 import { NichePrismaRepository } from "./infrastructure/repositories/NichePrismaRepository"
 import { createVideoDeps } from "./infrastructure/videos/createVideoDeps"
 import { buildServer } from "./interface/http/buildServer"
+
+validateRequiredEnv()
 
 const { jwtService, userRepository, subscriptionRepository, identityDeps } = createIdentityDeps()
 

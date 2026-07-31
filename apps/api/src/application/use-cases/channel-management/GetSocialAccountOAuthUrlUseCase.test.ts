@@ -16,7 +16,7 @@ async function buildScenario() {
     channelRepository,
     socialAccountRepository,
     oauthAdapters: { YOUTUBE: new FakeSocialOAuthAdapter() },
-    oauthStateSigner: new HmacOAuthStateSigner("test-secret"),
+    oauthStateSigner: new HmacOAuthStateSigner("test-secret-1234567890"),
   })
 
   await channelRepository.save(

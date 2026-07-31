@@ -59,7 +59,7 @@ describe("DisconnectSocialAccountUseCase", () => {
     await useCase.execute({ tenantId: "tenant-1", channelId: "channel-1", accountId: "account-1" })
 
     expect(await socialAccountRepository.findById("account-1")).toBeNull()
-    const channel = await channelRepository.findById("channel-1")
+    const channel = await channelRepository.findById("channel-1", "tenant-1")
     expect(channel?.status).toBe("DRAFT")
     expect(channelScheduleEventPublisher.removed).toEqual([
       expect.objectContaining({ channelId: "channel-1" }),
@@ -87,6 +87,27 @@ describe("DisconnectSocialAccountUseCase", () => {
 
     await expect(
       useCase.execute({ tenantId: "tenant-1", channelId: "channel-1", accountId: "ghost" }),
+    ).rejects.toThrow(SocialAccountNotFoundError)
+  })
+
+  it("should reject when the account belongs to a different channel", async () => {
+    const { useCase, socialAccountRepository } = await buildScenario()
+    await socialAccountRepository.save(
+      SocialAccount.create({
+        id: "account-2",
+        channelId: "channel-2",
+        platform: "TIKTOK",
+        externalAccountId: "tt-1",
+        status: "CONNECTED",
+        encryptedTokens: Buffer.from("x"),
+        tokenKeyVersion: 1,
+        refreshExpiresAt: null,
+        createdAt: new Date(),
+      }),
+    )
+
+    await expect(
+      useCase.execute({ tenantId: "tenant-1", channelId: "channel-1", accountId: "account-2" }),
     ).rejects.toThrow(SocialAccountNotFoundError)
   })
 })

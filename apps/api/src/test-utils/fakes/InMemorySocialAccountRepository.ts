@@ -9,6 +9,11 @@ export class InMemorySocialAccountRepository implements SocialAccountRepository 
     return Promise.resolve(this.accountsById.get(id) ?? null)
   }
 
+  findByIdAndChannel(id: string, channelId: string): Promise<SocialAccount | null> {
+    const account = this.accountsById.get(id)
+    return Promise.resolve(account && account.channelId === channelId ? account : null)
+  }
+
   findByChannelAndPlatform(
     channelId: string,
     platform: SocialAccountPlatform,
@@ -33,7 +38,10 @@ export class InMemorySocialAccountRepository implements SocialAccountRepository 
     return Promise.resolve()
   }
 
-  delete(id: string): Promise<void> {
+  // channelId scoping is a real Prisma-level guarantee (see SocialAccountPrismaRepository);
+  // callers only ever reach delete() with an already-ownership-verified account, so the fake
+  // doesn't need to re-simulate that branch.
+  delete(id: string, _channelId: string): Promise<void> {
     this.accountsById.delete(id)
     return Promise.resolve()
   }

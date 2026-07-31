@@ -9,9 +9,10 @@ export class InMemoryChannelRepository implements ChannelRepository {
   private readonly channelsById = new Map<string, Channel>()
   private readonly deletedIds = new Set<string>()
 
-  findById(id: string): Promise<Channel | null> {
+  findById(id: string, tenantId: string): Promise<Channel | null> {
     if (this.deletedIds.has(id)) return Promise.resolve(null)
-    return Promise.resolve(this.channelsById.get(id) ?? null)
+    const channel = this.channelsById.get(id)
+    return Promise.resolve(channel && channel.tenantId === tenantId ? channel : null)
   }
 
   findPaginatedByTenant(filter: ChannelListFilter): Promise<ChannelListResult> {
@@ -32,7 +33,10 @@ export class InMemoryChannelRepository implements ChannelRepository {
     return Promise.resolve()
   }
 
-  delete(id: string): Promise<void> {
+  // tenantId scoping is a real Prisma-level guarantee (see ChannelPrismaRepository); callers
+  // only ever reach delete() with an already-ownership-verified channel, so the fake doesn't
+  // need to re-simulate that branch.
+  delete(id: string, _tenantId: string): Promise<void> {
     this.deletedIds.add(id)
     return Promise.resolve()
   }

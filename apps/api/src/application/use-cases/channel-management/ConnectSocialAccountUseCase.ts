@@ -47,8 +47,8 @@ export class ConnectSocialAccountUseCase {
   constructor(private readonly deps: ConnectSocialAccountUseCaseDeps) {}
 
   async execute(input: ConnectSocialAccountInput): Promise<ConnectSocialAccountOutput> {
-    const channel = await this.deps.channelRepository.findById(input.channelId)
-    if (!channel || channel.tenantId !== input.tenantId) {
+    const channel = await this.deps.channelRepository.findById(input.channelId, input.tenantId)
+    if (!channel) {
       throw new ChannelNotFoundError(input.channelId)
     }
 

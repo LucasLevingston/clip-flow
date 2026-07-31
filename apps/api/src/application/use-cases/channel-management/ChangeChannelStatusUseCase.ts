@@ -26,8 +26,8 @@ export class ChangeChannelStatusUseCase {
   constructor(private readonly deps: ChangeChannelStatusUseCaseDeps) {}
 
   async execute(input: ChangeChannelStatusInput): Promise<ChannelDto> {
-    const channel = await this.deps.channelRepository.findById(input.channelId)
-    if (!channel || channel.tenantId !== input.tenantId) {
+    const channel = await this.deps.channelRepository.findById(input.channelId, input.tenantId)
+    if (!channel) {
       throw new ChannelNotFoundError(input.channelId)
     }
 

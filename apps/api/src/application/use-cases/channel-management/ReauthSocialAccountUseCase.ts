@@ -45,13 +45,16 @@ export class ReauthSocialAccountUseCase {
   constructor(private readonly deps: ReauthSocialAccountUseCaseDeps) {}
 
   async execute(input: ReauthSocialAccountInput): Promise<ReauthSocialAccountOutput> {
-    const channel = await this.deps.channelRepository.findById(input.channelId)
-    if (!channel || channel.tenantId !== input.tenantId) {
+    const channel = await this.deps.channelRepository.findById(input.channelId, input.tenantId)
+    if (!channel) {
       throw new ChannelNotFoundError(input.channelId)
     }
 
-    const account = await this.deps.socialAccountRepository.findById(input.accountId)
-    if (!account || account.channelId !== input.channelId) {
+    const account = await this.deps.socialAccountRepository.findByIdAndChannel(
+      input.accountId,
+      input.channelId,
+    )
+    if (!account) {
       throw new SocialAccountNotFoundError(input.accountId)
     }
 

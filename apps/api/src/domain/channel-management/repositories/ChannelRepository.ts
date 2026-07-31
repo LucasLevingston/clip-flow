@@ -13,9 +13,10 @@ export interface ChannelListResult {
 }
 
 export interface ChannelRepository {
-  findById(id: string): Promise<Channel | null>
+  /** Scoped by tenantId at the query level — never trust a bare id from a route param alone. */
+  findById(id: string, tenantId: string): Promise<Channel | null>
   findPaginatedByTenant(filter: ChannelListFilter): Promise<ChannelListResult>
   save(channel: Channel): Promise<void>
   /** Soft delete — sets `deletedAt`, preserves referenced GeneratedVideo history. */
-  delete(id: string): Promise<void>
+  delete(id: string, tenantId: string): Promise<void>
 }
