@@ -1,3 +1,5 @@
+import type { ChannelPerformanceRecord } from "../types"
+
 export interface CreateAnalyticsSnapshotInput {
   publishRecordId: string
   views: number
@@ -10,4 +12,6 @@ export interface CreateAnalyticsSnapshotInput {
 
 export interface AnalyticsSnapshotRepository {
   create(input: CreateAnalyticsSnapshotInput): Promise<void>
+  /** Latest snapshot per published video of the channel — see docs/architecture/analytics-flow.md. */
+  findByChannelId(channelId: string): Promise<ChannelPerformanceRecord[]>
 }

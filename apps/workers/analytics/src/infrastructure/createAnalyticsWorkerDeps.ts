@@ -1,9 +1,13 @@
 import { createQueueProducer } from "@clip-flow/worker-kit"
 import { CollectAnalyticsUseCase } from "../application/use-cases/CollectAnalyticsUseCase"
 import { ScheduleAnalyticsCollectionUseCase } from "../application/use-cases/ScheduleAnalyticsCollectionUseCase"
+import { SyncChannelInsightsScheduleUseCase } from "../application/use-cases/SyncChannelInsightsScheduleUseCase"
+import { UpdateChannelInsightsUseCase } from "../application/use-cases/UpdateChannelInsightsUseCase"
 import { AesGcmEncryptor } from "./AesGcmEncryptor"
 import { AnalyticsSnapshotPrismaRepository } from "./AnalyticsSnapshotPrismaRepository"
+import { BullMqInsightsJobScheduler } from "./BullMqInsightsJobScheduler"
 import { BullMqRepeatableJobScheduler } from "./BullMqRepeatableJobScheduler"
+import { ChannelInsightsPrismaRepository } from "./ChannelInsightsPrismaRepository"
 import { PublishRecordPrismaRepository } from "./PublishRecordPrismaRepository"
 import { SocialAccountPrismaRepository } from "./SocialAccountPrismaRepository"
 import { SystemClock } from "./SystemClock"
@@ -46,5 +50,20 @@ export function createAnalyticsWorkerDeps() {
     repeatableJobScheduler,
   })
 
-  return { collectAnalyticsUseCase, scheduleAnalyticsCollectionUseCase }
+  const updateChannelInsightsUseCase = new UpdateChannelInsightsUseCase({
+    analyticsSnapshotRepository: new AnalyticsSnapshotPrismaRepository(),
+    channelInsightsRepository: new ChannelInsightsPrismaRepository(),
+    clock: new SystemClock(),
+  })
+
+  const syncChannelInsightsScheduleUseCase = new SyncChannelInsightsScheduleUseCase({
+    insightsJobScheduler: new BullMqInsightsJobScheduler(createQueueProducer("analytics")),
+  })
+
+  return {
+    collectAnalyticsUseCase,
+    scheduleAnalyticsCollectionUseCase,
+    updateChannelInsightsUseCase,
+    syncChannelInsightsScheduleUseCase,
+  }
 }
