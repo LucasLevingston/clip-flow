@@ -16,7 +16,7 @@
     "@clip-flow/database": "workspace:^",
     "@clip-flow/worker-kit": "workspace:^",
     "@supabase/supabase-js": "^2.111.0",
-    "bullmq": "^5.81.2"
+    "bullmq": "^6.0.5"
   },
   "devDependencies": {
     "@clip-flow/eslint-config": "workspace:^",

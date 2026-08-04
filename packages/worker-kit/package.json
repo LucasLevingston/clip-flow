@@ -12,8 +12,8 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
-    "bullmq": "^5.81.2",
-    "ioredis": "^5.11.1"
+    "bullmq": "^6.0.5",
+    "ioredis": "^6.0.0"
   },
   "devDependencies": {
     "@clip-flow/eslint-config": "workspace:^",
