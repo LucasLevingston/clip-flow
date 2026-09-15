@@ -19,12 +19,12 @@
     "@fastify/cookie": "^11.1.2",
     "@fastify/cors": "^11.3.0",
     "bcryptjs": "^3.0.3",
-    "bullmq": "^5.81.2",
-    "fast-xml-parser": "^5.10.1",
-    "fastify": "^5.10.0",
+    "bullmq": "^6.3.4",
+    "fast-xml-parser": "^5.11.1",
+    "fastify": "^5.12.4",
     "jsonwebtoken": "^9.0.3",
-    "stripe": "^22.3.2",
-    "zod": "^4.4.3"
+    "stripe": "^22.6.2",
+    "zod": "^4.6.2"
   },
   "devDependencies": {
     "@clip-flow/eslint-config": "workspace:^",
