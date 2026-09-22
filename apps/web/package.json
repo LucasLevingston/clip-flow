@@ -31,18 +31,18 @@
   },
   "devDependencies": {
     "@clip-flow/eslint-config": "workspace:^",
-    "@playwright/test": "^1.62.1",
-    "@testing-library/jest-dom": "^7.0.0",
-    "@testing-library/react": "^16.3.2",
-    "@testing-library/user-event": "^14.5.2",
+    "@playwright/test": "^1.63.0",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "@types/jest": "^30.0.0",
-    "@types/node": "^20.0.0",
+    "@types/node": "^26.6.2",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "jest": "^30.4.2",
-    "jest-environment-jsdom": "^30.4.1",
+    "jest": "^30.5.2",
+    "jest-environment-jsdom": "^30.5.2",
     "msw": "^2.7.0",
-    "typescript": "^5.9.3",
-    "undici": "^7.2.0"
+    "typescript": "^7.0.2",
+    "undici": "^8.10.2"
   }
 }
