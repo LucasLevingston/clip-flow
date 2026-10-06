@@ -29,17 +29,17 @@
   "devDependencies": {
     "@clip-flow/eslint-config": "workspace:^",
     "@clip-flow/jest-preset": "workspace:^",
-    "@testcontainers/postgresql": "^12.0.4",
+    "@testcontainers/postgresql": "^12.2.0",
     "@types/bcryptjs": "^3.0.0",
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^20.0.0",
+    "@types/node": "^26.6.4",
     "cross-env": "^10.1.0",
-    "jest": "^30.4.2",
-    "testcontainers": "^12.0.4",
-    "ts-jest": "^29.4.12",
+    "jest": "^30.5.2",
+    "testcontainers": "^12.2.0",
+    "ts-jest": "^29.4.14",
     "tsup": "^8.5.1",
-    "tsx": "^4.23.1",
-    "typescript": "^5.9.3"
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
   }
 }
